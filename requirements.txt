@@ -1,0 +1,8 @@
+torch==2.0.1      
+torch-geometric  
+numpy
+matplotlib
+pandas
+tqdm
+argparse
+
