@@ -249,6 +249,18 @@ def main(args):
         plot_training_progress(train_losses, train_accuracies, os.path.join(logs_folder, "plots"))
         plot_training_progress(val_losses, val_accuracies, os.path.join(logs_folder, "plotsVal"))
 
+        # DELETE TRAIN DATASET VARIABLES
+        if use_validation:
+            del train_dataset
+            del train_loader
+            del full_dataset
+            del val_dataset
+            del val_loader
+        else:
+            del train_dataset
+            del train_loader
+        gc.collect()
+
     # Prepare test dataset and loader
     print("loading test datasets")
     test_dataset = GraphDataset(args.test_path, transform=add_zeros)
