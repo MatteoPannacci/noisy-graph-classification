@@ -161,6 +161,8 @@ def main(args):
     logging.basicConfig(filename=log_file, filemode='w', level=logging.INFO, format='%(asctime)s - %(message)s')
     logging.getLogger().addHandler(logging.StreamHandler())  # Console output as well
 
+    print(log_file)
+
     for handler in logging.getLogger().handlers:
         print(handler)
 
