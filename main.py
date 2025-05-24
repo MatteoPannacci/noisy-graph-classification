@@ -4,6 +4,7 @@ import torch
 from torch_geometric.loader import DataLoader
 from src.loadData import GraphDataset
 from src.utils import set_seed
+from src.losses import NoisyCrossEntropyLoss
 import pandas as pd
 import matplotlib.pyplot as plt
 import logging
@@ -49,7 +50,7 @@ def evaluate(data_loader, model, device, calculate_accuracy=False):
     total = 0
     predictions = []
     total_loss = 0
-    criterion = torch.nn.CrossEntropyLoss()
+    criterion = torch.nn.CrossEntropyLoss()  # use NoisyCrossEntropy?
     with torch.no_grad():
         for data in tqdm(data_loader, desc="Iterating eval graphs", unit="batch"):
             data = data.to(device)
@@ -137,7 +138,12 @@ def main(args):
 
     # setup optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-    criterion = torch.nn.CrossEntropyLoss()
+
+    # choose loss type
+    if args.loss_type == 2:
+        criterion = NoisyCrossEntropyLoss(args.noise_prob)
+    else:
+        criterion = torch.nn.CrossEntropyLoss()
 
     # Identify dataset folder (A, B, C, or D)
     test_dir_name = os.path.basename(os.path.dirname(args.test_path))
@@ -267,6 +273,8 @@ if __name__ == "__main__":
     parser.add_argument('--batch_size', type=int, default=32, help='input batch size for training (default: 32)')
     parser.add_argument('--epochs', type=int, default=10, help='number of epochs to train (default: 10)')
     parser.add_argument('--seed', type=int, default=42, help='random seed')
+    parser.add_argument('--loss_type', type=int, default=1, help='[1]: CrossEntropy; [2]: NoisyCrossEntropy')
+    parser.add_argument('--noise_prob', type=float, default=0.2)
 
     args = parser.parse_args()
 

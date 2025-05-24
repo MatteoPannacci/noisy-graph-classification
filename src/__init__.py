@@ -3,3 +3,4 @@ from .loadData import *
 from .models import *
 from .utils import set_seed
 from .conv import *
+from .losses import *
