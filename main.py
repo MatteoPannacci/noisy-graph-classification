@@ -161,6 +161,9 @@ def main(args):
     logging.basicConfig(filename=log_file, filemode='w', level=logging.INFO, format='%(asctime)s - %(message)s')
     logging.getLogger().addHandler(logging.StreamHandler())  # Console output as well
 
+    for handler in logging.getLogger().handlers:
+        print(handler)
+
     # Define checkpoint path relative to the script's directory
     print("looking for checkpoints")
     checkpoint_path = os.path.join(script_dir, "checkpoints", f"model_{test_dir_name}_best.pth")
@@ -233,10 +236,8 @@ def main(args):
 
             # Save logs for training progress
             if use_validation:
-                print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, Val Acc: {val_acc:.4f}")
                 logging.info(f"Epoch {epoch + 1}/{num_epochs}, Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, Val Acc: {val_acc:.4f}")
             else:
-                print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}")
                 logging.info(f"Epoch {epoch + 1}/{num_epochs}, Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}")
 
             # flush the logs
