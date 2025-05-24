@@ -14,13 +14,17 @@ from src.models import GNN
 # Set the random seed
 set_seed()
 
+
 def add_zeros(data):
     data.x = torch.zeros(data.num_nodes, dtype=torch.long)
     return data
 
+
 def train(data_loader, model, optimizer, criterion, device, save_checkpoints, checkpoint_path, current_epoch):
+
     model.train()
     total_loss = 0
+
     for data in tqdm(data_loader, desc="Iterating training graphs", unit="batch"):
         data = data.to(device)
         optimizer.zero_grad()
@@ -37,6 +41,7 @@ def train(data_loader, model, optimizer, criterion, device, save_checkpoints, ch
         print(f"Checkpoint saved at {checkpoint_file}")
 
     return total_loss / len(data_loader)
+
 
 def evaluate(data_loader, model, device, calculate_accuracy=False):
     model.eval()
@@ -56,6 +61,7 @@ def evaluate(data_loader, model, device, calculate_accuracy=False):
         accuracy = correct / total
         return accuracy, predictions
     return predictions
+
 
 def save_predictions(predictions, test_path):
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -99,6 +105,7 @@ def plot_training_progress(train_losses, train_accuracies, output_dir):
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, "training_progress.png"))
     plt.close()
+
 
 def main(args):
     # Get the directory where the main script is located
@@ -148,7 +155,8 @@ def main(args):
 
     # If train_path is provided, train the model
     if args.train_path:
-        print("starting training")
+
+        print("loading train datasets")
         train_dataset = GraphDataset(args.train_path, transform=add_zeros)
         train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
 
@@ -164,6 +172,7 @@ def main(args):
         else:
             checkpoint_intervals = [num_epochs]
 
+        print("starting training")
         for epoch in range(num_epochs):
             train_loss = train(
                 train_loader, model, optimizer, criterion, device,
@@ -189,6 +198,7 @@ def main(args):
         plot_training_progress(train_losses, train_accuracies, os.path.join(logs_folder, "plots"))
 
     # Prepare test dataset and loader
+    print("loading test datasets")
     test_dataset = GraphDataset(args.test_path, transform=add_zeros)
     test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
 
