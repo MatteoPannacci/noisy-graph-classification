@@ -241,13 +241,9 @@ def main(args):
 
             # Save logs for training progress
             if use_validation:
-                logging.info(f"Epoch {epoch + 1}/{num_epochs}, Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, Val Acc: {val_acc:.4f}")
+                logger.info(f"Epoch {epoch + 1}/{num_epochs}, Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, Val Acc: {val_acc:.4f}")
             else:
-                logging.info(f"Epoch {epoch + 1}/{num_epochs}, Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}")
-
-            # flush the logs
-            for handler in logging.getLogger().handlers:
-                handler.flush()
+                logger.info(f"Epoch {epoch + 1}/{num_epochs}, Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}")
 
             # Save best model
             if (use_validation and val_acc > best_accuracy):
@@ -274,14 +270,6 @@ def main(args):
             del train_dataset
             del train_loader
         gc.collect()
-
-        # flush and close all handlers
-        for handler in logging.root.handlers[:]:
-            handler.flush()
-            handler.close()
-            logging.root.removeHandler(handler)
-
-        logging.shutdown()
 
     # Prepare test dataset and loader
     print("loading test datasets")
