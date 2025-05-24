@@ -235,10 +235,9 @@ def main(args):
                 print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}")
                 logging.info(f"Epoch {epoch + 1}/{num_epochs}, Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}")
 
-            # force logging flush
+            # flush the logs
             for handler in logging.getLogger().handlers:
                 handler.flush()
-                handler.close()
 
             # Save best model
             if (use_validation and val_acc > best_accuracy):
@@ -265,6 +264,14 @@ def main(args):
             del train_dataset
             del train_loader
         gc.collect()
+
+        # flush and close all handlers
+        for handler in logging.root.handlers[:]:
+            handler.flush()
+            handler.close()
+            logging.root.removeHandler(handler)
+
+        logging.shutdown()
 
     # Prepare test dataset and loader
     print("loading test datasets")
