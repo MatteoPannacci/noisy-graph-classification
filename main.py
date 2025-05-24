@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import logging
 from tqdm import tqdm
 import gc
+from torch.utils.data import random_split
 
 from src.models import GNN 
 
