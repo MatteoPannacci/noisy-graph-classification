@@ -171,10 +171,12 @@ def main(args):
     # If train_path is provided, train the model
     if args.train_path:
 
-        full_dataset = GraphDataset(args.train_path, transform=add_zeros)
+        print("loading train datasets")
         use_validation = (args.val_proportion != 0.0)
 
         if use_validation:
+
+            full_dataset = GraphDataset(args.train_path, transform=add_zeros)
             val_size = int(0.2 * len(full_dataset))
             train_size = len(full_dataset) - val_size
 
@@ -185,7 +187,6 @@ def main(args):
             val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
 
         else:
-            print("loading train datasets")
             train_dataset = GraphDataset(args.train_path, transform=add_zeros)
             train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
 
