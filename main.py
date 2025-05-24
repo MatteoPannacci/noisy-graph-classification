@@ -68,22 +68,21 @@ def evaluate(data_loader, model, device, calculate_accuracy=False):
     return predictions
 
 
-
 def save_predictions(predictions, test_path):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     submission_folder = os.path.join(script_dir, "submission")
     test_dir_name = os.path.basename(os.path.dirname(test_path))
-    
+
     os.makedirs(submission_folder, exist_ok=True)
-    
+
     output_csv_path = os.path.join(submission_folder, f"testset_{test_dir_name}.csv")
-    
+
     test_graph_ids = list(range(len(predictions)))
     output_df = pd.DataFrame({
         "id": test_graph_ids,
         "pred": predictions
     })
-    
+
     output_df.to_csv(output_csv_path, index=False)
     print(f"Predictions saved to {output_csv_path}")
 
@@ -124,7 +123,6 @@ def main(args):
     print(f"Device: {device}")
     num_checkpoints = args.num_checkpoints if args.num_checkpoints else 3
 
-
     print("creating model")
     if args.gnn == 'gin':
         model = GNN(gnn_type = 'gin', num_class = 6, num_layer = args.num_layer, emb_dim = args.emb_dim, drop_ratio = args.drop_ratio, virtual_node = False).to(device)
@@ -136,6 +134,8 @@ def main(args):
         model = GNN(gnn_type = 'gcn', num_class = 6, num_layer = args.num_layer, emb_dim = args.emb_dim, drop_ratio = args.drop_ratio, virtual_node = True).to(device)
     else:
         raise ValueError('Invalid GNN type')
+
+    # setup optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     criterion = torch.nn.CrossEntropyLoss()
 
@@ -149,7 +149,6 @@ def main(args):
     os.makedirs(os.path.dirname(log_file), exist_ok=True)
     logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(message)s')
     logging.getLogger().addHandler(logging.StreamHandler())  # Console output as well
-
 
     # Define checkpoint path relative to the script's directory
     print("looking for checkpoints")
@@ -167,7 +166,6 @@ def main(args):
     if args.train_path:
 
         full_dataset = GraphDataset(args.train_path, transform=add_zeros)
-
         use_validation = (args.val_proportion != 0.0)
 
         if use_validation:
@@ -186,7 +184,7 @@ def main(args):
             train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
 
         num_epochs = args.epochs
-        best_val_accuracy = 0.0   
+        best_val_accuracy = 0.0
 
         train_losses = []
         train_accuracies = []
@@ -253,6 +251,7 @@ def main(args):
     model.load_state_dict(torch.load(checkpoint_path))
     predictions = evaluate(test_loader, model, device, calculate_accuracy=False)
     save_predictions(predictions, args.test_path)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train and evaluate GNN models on graph datasets.")
