@@ -134,18 +134,16 @@ def main(args):
 
 
     # Define checkpoint path relative to the script's directory
+    print("looking for checkpoints")
     checkpoint_path = os.path.join(script_dir, "checkpoints", f"model_{test_dir_name}_best.pth")
     checkpoints_folder = os.path.join(script_dir, "checkpoints", test_dir_name)
     os.makedirs(checkpoints_folder, exist_ok=True)
 
     # Load pre-trained model for inference
     if os.path.exists(checkpoint_path) and not args.train_path:
+        print("loading best model")
         model.load_state_dict(torch.load(checkpoint_path))
         print(f"Loaded best model from {checkpoint_path}")
-
-    # Prepare test dataset and loader
-    test_dataset = GraphDataset(args.test_path, transform=add_zeros)
-    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
 
     # If train_path is provided, train the model
     if args.train_path:
@@ -188,6 +186,10 @@ def main(args):
 
         # Plot training progress in current directory
         plot_training_progress(train_losses, train_accuracies, os.path.join(logs_folder, "plots"))
+
+    # Prepare test dataset and loader
+    test_dataset = GraphDataset(args.test_path, transform=add_zeros)
+    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
 
     # Generate predictions for the test set using the best model
     print("generating prediction")
