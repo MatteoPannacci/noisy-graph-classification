@@ -9,6 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import logging
 from tqdm import tqdm
+import gc
 
 from src.models import GNN 
 
@@ -191,7 +192,7 @@ def main(args):
             train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
 
         num_epochs = args.epochs
-        best_val_accuracy = 0.0
+        best_accuracy = 0.0
 
         train_losses = []
         train_accuracies = []
@@ -236,7 +237,7 @@ def main(args):
 
             # Save best model
             if (use_validation and val_acc > best_accuracy):
-                best_val_accuracy = val_acc
+                best_accuracy = val_acc
                 torch.save(model.state_dict(), checkpoint_path)
                 print(f"Best model updated and saved at {checkpoint_path}")
             elif (not use_validation and train_acc > best_accuracy):
