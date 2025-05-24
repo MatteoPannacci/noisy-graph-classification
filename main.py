@@ -11,9 +11,6 @@ from tqdm import tqdm
 
 from src.models import GNN 
 
-# Set the random seed
-set_seed()
-
 
 def add_zeros(data):
     data.x = torch.zeros(data.num_nodes, dtype=torch.long)
@@ -117,6 +114,10 @@ def plot_training_progress(train_losses, train_accuracies, output_dir):
 
 
 def main(args):
+
+    # Set the random seed
+    set_seed(args.seed)
+
     # Get the directory where the main script is located
     script_dir = os.path.dirname(os.path.abspath(__file__))
     device = torch.device("cuda:" + str(args.device)) if torch.cuda.is_available() else torch.device("cpu")
@@ -266,6 +267,7 @@ if __name__ == "__main__":
     parser.add_argument('--emb_dim', type=int, default=300, help='dimensionality of hidden units in GNNs (default: 300)')
     parser.add_argument('--batch_size', type=int, default=32, help='input batch size for training (default: 32)')
     parser.add_argument('--epochs', type=int, default=10, help='number of epochs to train (default: 10)')
+    parser.add_argument('--seed', type=int, default=42, help='random seed')
 
     args = parser.parse_args()
 
