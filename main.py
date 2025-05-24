@@ -105,9 +105,9 @@ def main(args):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     device = torch.device("cuda:" + str(args.device)) if torch.cuda.is_available() else torch.device("cpu")
     num_checkpoints = args.num_checkpoints if args.num_checkpoints else 3
-    
-    
 
+    
+    print("creating model")
     if args.gnn == 'gin':
         model = GNN(gnn_type = 'gin', num_class = 6, num_layer = args.num_layer, emb_dim = args.emb_dim, drop_ratio = args.drop_ratio, virtual_node = False).to(device)
     elif args.gnn == 'gin-virtual':
@@ -125,6 +125,7 @@ def main(args):
     test_dir_name = os.path.basename(os.path.dirname(args.test_path))
     
     # Setup logging
+    print("setup logging")
     logs_folder = os.path.join(script_dir, "logs", test_dir_name)
     log_file = os.path.join(logs_folder, "training.log")
     os.makedirs(os.path.dirname(log_file), exist_ok=True)
@@ -148,6 +149,7 @@ def main(args):
 
     # If train_path is provided, train the model
     if args.train_path:
+        print("starting training")
         train_dataset = GraphDataset(args.train_path, transform=add_zeros)
         train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
 
@@ -188,6 +190,7 @@ def main(args):
         plot_training_progress(train_losses, train_accuracies, os.path.join(logs_folder, "plots"))
 
     # Generate predictions for the test set using the best model
+    print("generating prediction")
     model.load_state_dict(torch.load(checkpoint_path))
     predictions = evaluate(test_loader, model, device, calculate_accuracy=False)
     save_predictions(predictions, args.test_path)
@@ -206,4 +209,6 @@ if __name__ == "__main__":
     parser.add_argument('--epochs', type=int, default=10, help='number of epochs to train (default: 10)')
     
     args = parser.parse_args()
+
+    print("starting main")
     main(args)
