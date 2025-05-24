@@ -154,7 +154,7 @@ def main(args):
     logs_folder = os.path.join(script_dir, "logs", test_dir_name)
     log_file = os.path.join(logs_folder, "training.log")
     os.makedirs(os.path.dirname(log_file), exist_ok=True)
-    logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(message)s')
+    logging.basicConfig(filename=log_file, filemode='w', level=logging.INFO, format='%(asctime)s - %(message)s')
     logging.getLogger().addHandler(logging.StreamHandler())  # Console output as well
 
     # Define checkpoint path relative to the script's directory
@@ -234,6 +234,11 @@ def main(args):
             else:
                 print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}")
                 logging.info(f"Epoch {epoch + 1}/{num_epochs}, Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}")
+
+            # force logging flush
+            for handler in logging.getLogger().handlers:
+                handler.flush()
+                handler.close()
 
             # Save best model
             if (use_validation and val_acc > best_accuracy):
