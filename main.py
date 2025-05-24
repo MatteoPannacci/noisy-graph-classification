@@ -142,7 +142,7 @@ def main(args):
         raise ValueError('Invalid GNN type')
 
     # setup optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
     # choose loss type
     if args.loss_type == 2:
@@ -301,6 +301,7 @@ if __name__ == "__main__":
     parser.add_argument('--loss_type', type=int, default=1, help='[1]: CrossEntropy; [2]: NoisyCrossEntropy')
     parser.add_argument('--noise_prob', type=float, default=0.2)
     parser.add_argument('--lr', type=float, default=0.001, help='optimizer learning rate')
+    parser.add_argument('--weight_decay', type=float, default=0.0)
 
     args = parser.parse_args()
 
