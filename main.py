@@ -104,6 +104,7 @@ def main(args):
     # Get the directory where the main script is located
     script_dir = os.path.dirname(os.path.abspath(__file__))
     device = torch.device("cuda:" + str(args.device)) if torch.cuda.is_available() else torch.device("cpu")
+    print(f"Device: {device}")
     num_checkpoints = args.num_checkpoints if args.num_checkpoints else 3
 
     
