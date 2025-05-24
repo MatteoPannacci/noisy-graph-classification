@@ -20,10 +20,12 @@ def add_zeros(data):
 
 
 def train(data_loader, model, optimizer, criterion, device, save_checkpoints, checkpoint_path, current_epoch):
+
     model.train()
     total_loss = 0
     correct = 0
     total = 0
+
     for data in tqdm(data_loader, desc="Iterating training graphs", unit="batch"):
         data = data.to(device)
         optimizer.zero_grad()
@@ -36,7 +38,6 @@ def train(data_loader, model, optimizer, criterion, device, save_checkpoints, ch
         correct += (pred == data.y).sum().item()
         total += data.y.size(0)
 
-    # Save checkpoints if required
     if save_checkpoints:
         checkpoint_file = f"{checkpoint_path}_epoch_{current_epoch + 1}.pth"
         torch.save(model.state_dict(), checkpoint_file)
@@ -46,27 +47,31 @@ def train(data_loader, model, optimizer, criterion, device, save_checkpoints, ch
 
 
 def evaluate(data_loader, model, device, calculate_accuracy=False):
+
     model.eval()
     correct = 0
     total = 0
     predictions = []
     total_loss = 0
     criterion = torch.nn.CrossEntropyLoss()  # use NoisyCrossEntropy?
+
     with torch.no_grad():
+
         for data in tqdm(data_loader, desc="Iterating eval graphs", unit="batch"):
             data = data.to(device)
             output = model(data)
             pred = output.argmax(dim=1)
-            
             if calculate_accuracy:
                 correct += (pred == data.y).sum().item()
                 total += data.y.size(0)
                 total_loss += criterion(output, data.y).item()
             else:
                 predictions.extend(pred.cpu().numpy())
+
     if calculate_accuracy:
         accuracy = correct / total
         return  total_loss / len(data_loader), accuracy
+
     return predictions
 
 
@@ -76,7 +81,6 @@ def save_predictions(predictions, test_path):
     test_dir_name = os.path.basename(os.path.dirname(test_path))
 
     os.makedirs(submission_folder, exist_ok=True)
-
     output_csv_path = os.path.join(submission_folder, f"testset_{test_dir_name}.csv")
 
     test_graph_ids = list(range(len(predictions)))
@@ -138,7 +142,7 @@ def main(args):
         raise ValueError('Invalid GNN type')
 
     # setup optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
     # choose loss type
     if args.loss_type == 2:
@@ -148,7 +152,7 @@ def main(args):
 
     # Identify dataset folder (A, B, C, or D)
     test_dir_name = os.path.basename(os.path.dirname(args.test_path))
-    
+
     # Setup logging
     print("setup logging")
     logs_folder = os.path.join(script_dir, "logs", test_dir_name)
@@ -286,6 +290,7 @@ def main(args):
 
 
 if __name__ == "__main__":
+
     parser = argparse.ArgumentParser(description="Train and evaluate GNN models on graph datasets.")
     parser.add_argument("--train_path", type=str, help="Path to the training dataset (optional).")
     parser.add_argument("--val_proportion", type=float, default=0.0, help="proportion of the train set to use for the validation set")
@@ -301,6 +306,7 @@ if __name__ == "__main__":
     parser.add_argument('--seed', type=int, default=42, help='random seed')
     parser.add_argument('--loss_type', type=int, default=1, help='[1]: CrossEntropy; [2]: NoisyCrossEntropy')
     parser.add_argument('--noise_prob', type=float, default=0.2)
+    parser.add_argument('--lr', type=float, default=0.001, help='optimizer learning rate')
 
     args = parser.parse_args()
 
