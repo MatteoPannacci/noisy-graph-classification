@@ -153,18 +153,21 @@ def main(args):
     # Identify dataset folder (A, B, C, or D)
     test_dir_name = os.path.basename(os.path.dirname(args.test_path))
 
-    # Setup logging
+    # Setup logger
     print("setup logging")
     logs_folder = os.path.join(script_dir, "logs", test_dir_name)
     log_file = os.path.join(logs_folder, "training.log")
     os.makedirs(os.path.dirname(log_file), exist_ok=True)
-    logging.basicConfig(filename=log_file, filemode='w', level=logging.INFO, format='%(asctime)s - %(message)s')
-    logging.getLogger().addHandler(logging.StreamHandler())  # Console output as well
 
-    print(log_file)
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
 
-    for handler in logging.getLogger().handlers:
-        print(handler)
+    file_handler = logging.FileHandler(filename=log_file, mode='w')
+    file_handler.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s - %(message)s')
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+    logger.addHandler(logging.StreamHandler())
 
     # Define checkpoint path relative to the script's directory
     print("looking for checkpoints")
