@@ -45,7 +45,7 @@ def compute_label_distribution(dataset_path):
     counters = [0 for _ in range(6)]
 
     for batch in loader:
-        for item in batch:
-            counters[item.y] += 1
-    
+        for label in batch.y.tolist():
+            counters[label] += 1
+
     print(counters)
