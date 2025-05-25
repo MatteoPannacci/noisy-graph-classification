@@ -94,28 +94,28 @@ def save_predictions(predictions, test_path):
     print(f"Predictions saved to {output_csv_path}")
 
 
-def plot_training_progress(train_losses, train_accuracies, output_dir):
-    epochs = range(1, len(train_losses) + 1)
+def plot_progress(split_name, losses, accuracies, output_dir):
+    epochs = range(1, len(losses) + 1)
     plt.figure(figsize=(12, 6))
 
     # Plot loss
     plt.subplot(1, 2, 1)
-    plt.plot(epochs, train_losses, label="Training Loss", color='blue')
+    plt.plot(epochs, losses, label=f"{split_name} Loss", color='blue')
     plt.xlabel('Epoch')
     plt.ylabel('Loss')
-    plt.title('Training Loss per Epoch')
+    plt.title(f'{split_name} Loss per Epoch')
 
     # Plot accuracy
     plt.subplot(1, 2, 2)
-    plt.plot(epochs, train_accuracies, label="Training Accuracy", color='green')
+    plt.plot(epochs, accuracies, label=f"{split_name} Accuracy", color='green')
     plt.xlabel('Epoch')
     plt.ylabel('Accuracy')
-    plt.title('Training Accuracy per Epoch')
+    plt.title(f'{split_name} Accuracy per Epoch')
 
     # Save plots in the current directory
     os.makedirs(output_dir, exist_ok=True)
     plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, "training_progress.png"))
+    plt.savefig(os.path.join(output_dir, f"{split_name}_progress.png"))
     plt.close()
 
 
@@ -131,16 +131,15 @@ def main(args):
     num_checkpoints = args.num_checkpoints if args.num_checkpoints else 3
 
     print("creating model")
-    if args.gnn == 'gin':
-        model = GNN(gnn_type = 'gin', num_class = 6, num_layer = args.num_layer, emb_dim = args.emb_dim, drop_ratio = args.drop_ratio, virtual_node = False).to(device)
-    elif args.gnn == 'gin-virtual':
-        model = GNN(gnn_type = 'gin', num_class = 6, num_layer = args.num_layer, emb_dim = args.emb_dim, drop_ratio = args.drop_ratio, virtual_node = True).to(device)
-    elif args.gnn == 'gcn':
-        model = GNN(gnn_type = 'gcn', num_class = 6, num_layer = args.num_layer, emb_dim = args.emb_dim, drop_ratio = args.drop_ratio, virtual_node = False).to(device)
-    elif args.gnn == 'gcn-virtual':
-        model = GNN(gnn_type = 'gcn', num_class = 6, num_layer = args.num_layer, emb_dim = args.emb_dim, drop_ratio = args.drop_ratio, virtual_node = True).to(device)
-    else:
-        raise ValueError('Invalid GNN type')
+    model = GNN(
+        gnn_type = args.gnn_type,
+        residual = args.residual
+        num_class = 6,
+        num_layer = args.num_layer,
+        emb_dim = args.emb_dim,
+        drop_ratio = args.drop_ratio,
+        virtual_node = args.virtual_node
+    ).to(device)
 
     # setup optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
@@ -250,15 +249,15 @@ def main(args):
             if (use_validation and val_acc > best_accuracy):
                 best_accuracy = val_acc
                 torch.save(model.state_dict(), checkpoint_path)
-                print(f"Best model updated and saved at {checkpoint_path}")
+                logger.info(f"Best model updated and saved at {checkpoint_path}")
             elif (not use_validation and train_acc > best_accuracy):
                 best_accuracy = train_acc
                 torch.save(model.state_dict(), checkpoint_path)
-                print(f"Best model updated and saved at {checkpoint_path}")
+                logger.info(f"Best model updated and saved at {checkpoint_path}")
 
         # Plot training progress in current directory
-        plot_training_progress(train_losses, train_accuracies, os.path.join(logs_folder, "plots"))
-        plot_training_progress(val_losses, val_accuracies, os.path.join(logs_folder, "plotsVal"))
+        plot_progress("Training", train_losses, train_accuracies, os.path.join(logs_folder, "plots"))
+        plot_progress("Validation", val_losses, val_accuracies, os.path.join(logs_folder, "plotsVal"))
 
         # DELETE TRAIN DATASET VARIABLES
         if use_validation:
@@ -292,7 +291,9 @@ if __name__ == "__main__":
     parser.add_argument("--test_path", type=str, required=True, help="Path to the test dataset.")
     parser.add_argument("--num_checkpoints", type=int, help="Number of checkpoints to save during training.")
     parser.add_argument('--device', type=int, default=1, help='which gpu to use if any (default: 0)')
-    parser.add_argument('--gnn', type=str, default='gin', help='GNN gin, gin-virtual, or gcn, or gcn-virtual (default: gin-virtual)')
+    parser.add_argument('--gnn_type', type=str, default='gin', choices=['gin', 'gcn'], help='GNN type: gin or gcn')
+    parser.add_argument('--virtual_node', type=bool, default=True, help='Use virtual node or not')
+    parser.add_argument('--residual', type=bool, default=True, help='Using residual connection or not')
     parser.add_argument('--drop_ratio', type=float, default=0.5, help='dropout ratio (default: 0.5)')
     parser.add_argument('--num_layer', type=int, default=5, help='number of GNN message passing layers (default: 5)')
     parser.add_argument('--emb_dim', type=int, default=300, help='dimensionality of hidden units in GNNs (default: 300)')
