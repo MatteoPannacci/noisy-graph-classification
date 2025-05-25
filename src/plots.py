@@ -35,7 +35,7 @@ def plot_progress(split_name, losses, accuracies, f1_scores, output_dir):
 
 
 def plot_all(train_losses, train_accuracies, train_f1s, val_losses, val_accuracies, val_f1s, output_dir):
-    epochs = range(1, len(losses) + 1)
+    epochs = range(1, len(train_losses) + 1)
     plt.figure(figsize=(18, 6))
 
     # Plot losses
