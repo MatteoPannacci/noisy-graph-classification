@@ -256,7 +256,6 @@ def main(args):
             logger.info(f"Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, Train F1: {train_f1:.4f}")
             if use_validation:
                 logger.info(f"Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}, Val F1: {val_f1:.4f}")
-            logger.info("---")
 
             # Save best model
             if (use_validation and val_acc > best_accuracy): # use f1 score instead?
@@ -267,6 +266,8 @@ def main(args):
                 best_accuracy = train_acc
                 torch.save(model.state_dict(), checkpoint_path)
                 logger.info(f"Best model updated and saved at {checkpoint_path}")
+            
+            logger.info("---")
 
         # Plot training progress in current directory
         plot_progress("Training", train_losses, train_accuracies, train_f1s, os.path.join(logs_folder, "plotsTrain"))
