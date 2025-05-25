@@ -14,7 +14,7 @@ class GraphDataset(Dataset):
 
 
     def len(self):
-        return self.num_graphs  
+        return self.num_graphs
     
 
     def get(self, idx):
