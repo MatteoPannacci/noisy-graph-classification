@@ -159,7 +159,8 @@ def main(args):
         num_layer = args.num_layer,
         emb_dim = args.emb_dim,
         drop_ratio = args.drop_ratio,
-        virtual_node = args.virtual_node
+        virtual_node = args.virtual_node,
+        graph_pooling = args.graph_pooling_type
     ).to(device)
 
     # setup optimizer
@@ -333,6 +334,7 @@ if __name__ == "__main__":
     parser.add_argument('--noise_prob', type=float, default=0.2)
     parser.add_argument('--lr', type=float, default=0.001, help='optimizer learning rate')
     parser.add_argument('--weight_decay', type=float, default=0.0)
+    parser.add_argument('--graph_pooling_type', type=str, default='mean', help='mean, sum, max, attention, set2set')
 
     args = parser.parse_args()
 
