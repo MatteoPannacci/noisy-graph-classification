@@ -145,10 +145,14 @@ def main(args):
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
     # choose loss type
-    if args.loss_type == 2:
-        criterion = NoisyCrossEntropyLoss(args.noise_prob)
-    else:
+    if args.loss_type == 1:
         criterion = torch.nn.CrossEntropyLoss()
+    elif args.loss_type == 2:
+        criterion = NoisyCrossEntropyLoss(args.noise_prob)
+    elif args.loss_type == 3:
+        criterion = SymmetricCrossEntropyLoss()
+    else:
+        raise ValueError("criterion not found")
 
     # Identify dataset folder (A, B, C, or D)
     test_dir_name = os.path.basename(os.path.dirname(args.test_path))
@@ -292,15 +296,15 @@ if __name__ == "__main__":
     parser.add_argument("--num_checkpoints", type=int, help="Number of checkpoints to save during training.")
     parser.add_argument('--device', type=int, default=1, help='which gpu to use if any (default: 0)')
     parser.add_argument('--gnn_type', type=str, default='gin', choices=['gin', 'gcn'], help='GNN type: gin or gcn')
-    parser.add_argument('--virtual_node', type=bool, default=True, help='Use virtual node or not')
-    parser.add_argument('--residual', type=bool, default=True, help='Using residual connection or not')
+    parser.add_argument('--virtual_node', type=str2bool, nargs='?', const=True, default=False, help='Use virtual node or not')
+    parser.add_argument('--residual', type=str2bool, nargs='?', const=True, default=False, help='Using residual connection or not')
     parser.add_argument('--drop_ratio', type=float, default=0.5, help='dropout ratio (default: 0.5)')
     parser.add_argument('--num_layer', type=int, default=5, help='number of GNN message passing layers (default: 5)')
     parser.add_argument('--emb_dim', type=int, default=300, help='dimensionality of hidden units in GNNs (default: 300)')
     parser.add_argument('--batch_size', type=int, default=32, help='input batch size for training (default: 32)')
     parser.add_argument('--epochs', type=int, default=10, help='number of epochs to train (default: 10)')
     parser.add_argument('--seed', type=int, default=42, help='random seed')
-    parser.add_argument('--loss_type', type=int, default=1, help='[1]: CrossEntropy; [2]: NoisyCrossEntropy')
+    parser.add_argument('--loss_type', type=int, default=1, help='[1]: CrossEntropy; [2]: NoisyCrossEntropy; [3] SymmetricCrossEntropy')
     parser.add_argument('--noise_prob', type=float, default=0.2)
     parser.add_argument('--lr', type=float, default=0.001, help='optimizer learning rate')
     parser.add_argument('--weight_decay', type=float, default=0.0)
