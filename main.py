@@ -133,7 +133,7 @@ def main(args):
     print("creating model")
     model = GNN(
         gnn_type = args.gnn_type,
-        residual = args.residual
+        residual = args.residual,
         num_class = 6,
         num_layer = args.num_layer,
         emb_dim = args.emb_dim,
