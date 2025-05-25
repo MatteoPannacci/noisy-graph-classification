@@ -38,6 +38,10 @@ def gzip_folder(folder_path, output_file):
 
 def compute_label_distribution(dataset_path):
 
+    def add_zeros(data):
+        data.x = torch.zeros(data.num_nodes, dtype=torch.long)
+        return data
+
     dataset = GraphDataset(dataset_path, transform=add_zeros)
     loader = DataLoader(dataset, batch_size=32, shuffle=False)
 
