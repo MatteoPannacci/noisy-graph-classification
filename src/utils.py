@@ -4,6 +4,7 @@ import numpy as np
 import tarfile
 import os
 from src.loadData import GraphDataset
+from torch_geometric.loader import DataLoader
 
 
 def add_zeros(data):
@@ -44,6 +45,7 @@ def compute_label_distribution(dataset_path):
     counters = [0 for _ in range(6)]
 
     for batch in loader:
-        print(batch)
+        for item in batch:
+            counters[item.y] += 1
     
     print(counters)
