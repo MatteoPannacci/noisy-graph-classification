@@ -30,7 +30,7 @@ class SymmetricCrossEntropyLoss(torch.nn.Module):
 
         ce_loss = self.ce(logits, targets)
 
-        one_hot_targets = torch.nn.functional.one_hot(targets, num_classes=self.num_classes).float()
+        one_hot_targets = torch.nn.functional.one_hot(targets, num_classes=logits.size(1)).float()
         pred_probs = torch.nn.functional.softmax(logits, dim=1).clamp(min=1e-7, max=1.0)
         rce_loss = -torch.sum(pred_probs * torch.log(one_hot_targets.clamp(min=1e-7)), dim=1).mean()
 
