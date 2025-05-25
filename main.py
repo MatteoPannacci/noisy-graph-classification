@@ -134,7 +134,8 @@ def main(args):
         emb_dim = args.emb_dim,
         drop_ratio = args.drop_ratio,
         virtual_node = args.virtual_node,
-        graph_pooling = args.graph_pooling_type
+        graph_pooling = args.graph_pooling_type,
+        JK = args.jk
     ).to(device)
 
     # Identify dataset folder (A, B, C, or D)
@@ -323,6 +324,7 @@ if __name__ == "__main__":
     parser.add_argument('--weight_decay', type=float, default=0.0)
     parser.add_argument('--graph_pooling_type', type=str, default='mean', help='mean, sum, max, attention, set2set')
     parser.add_argument('--use_class_weights', type=bool, default=False, action=argparse.BooleanOptionalAction, help='use class weights in the loss computation')
+    parser.add_argument('--jk', type=str, default="last", choices=['last', 'sum'])
 
     args = parser.parse_args()
 
