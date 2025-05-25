@@ -117,24 +117,24 @@ def save_predictions(predictions, test_path):
 
 def plot_progress(split_name, losses, accuracies, f1_scores, output_dir):
     epochs = range(1, len(losses) + 1)
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(18, 6))
 
     # Plot loss
-    plt.subplot(1, 2, 1)
+    plt.subplot(1, 3, 1)
     plt.plot(epochs, losses, label=f"{split_name} Loss", color='blue')
     plt.xlabel('Epoch')
     plt.ylabel('Loss')
     plt.title(f'{split_name} Loss per Epoch')
 
     # Plot accuracy
-    plt.subplot(1, 2, 2)
+    plt.subplot(1, 3, 2)
     plt.plot(epochs, accuracies, label=f"{split_name} Accuracy", color='green')
     plt.xlabel('Epoch')
     plt.ylabel('Accuracy')
     plt.title(f'{split_name} Accuracy per Epoch')
 
     # Plot f1 score
-    plt.subplot(1, 2, 2)
+    plt.subplot(1, 3, 3)
     plt.plot(epochs, f1_scores, label=f"{split_name} F1 Score", color='green')
     plt.xlabel('Epoch')
     plt.ylabel('F1 Score')
