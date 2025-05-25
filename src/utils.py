@@ -37,10 +37,7 @@ def gzip_folder(folder_path, output_file):
     print(f"Folder '{folder_path}' has been compressed into '{output_file}'")
 
 
-def compute_label_distribution(dataset_path):
-
-    dataset = GraphDataset(dataset_path, transform=add_zeros)
-    loader = DataLoader(dataset, batch_size=32, shuffle=False)
+def compute_label_distribution(loader):
 
     counters = [0 for _ in range(6)]
 

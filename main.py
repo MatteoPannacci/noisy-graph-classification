@@ -137,19 +137,6 @@ def main(args):
         graph_pooling = args.graph_pooling_type
     ).to(device)
 
-    # setup optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
-
-    # choose loss type
-    if args.loss_type == 1:
-        criterion = torch.nn.CrossEntropyLoss()
-    elif args.loss_type == 2:
-        criterion = NoisyCrossEntropyLoss(args.noise_prob)
-    elif args.loss_type == 3:
-        criterion = SymmetricCrossEntropyLoss()
-    else:
-        raise ValueError("criterion not found")
-
     # Identify dataset folder (A, B, C, or D)
     test_dir_name = os.path.basename(os.path.dirname(args.test_path))
 
@@ -202,6 +189,26 @@ def main(args):
         else:
             train_dataset = GraphDataset(args.train_path, transform=add_zeros)
             train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
+
+        # compute class weights
+        if args.use_class_weights:
+            class_weights = (1.0 / torch.tensor(compute_label_distribution(train_loader), dtype=torch.float, device=device))
+            class_weights = class_weights * len(class_weights) / class_weights.sum()
+        else:
+            class_weights = None
+
+        # setup optimizer
+        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+
+        # choose loss type
+        if args.loss_type == 1:
+            criterion = torch.nn.CrossEntropyLoss(weight=class_weights)
+        elif args.loss_type == 2:
+            criterion = NoisyCrossEntropyLoss(args.noise_prob, weight=class_weights)
+        elif args.loss_type == 3:
+            criterion = SymmetricCrossEntropyLoss(weight=class_weights)
+        else:
+            raise ValueError("criterion not found")
 
         num_epochs = args.epochs
         best_accuracy = 0.0
@@ -314,6 +321,7 @@ if __name__ == "__main__":
     parser.add_argument('--lr', type=float, default=0.001, help='optimizer learning rate')
     parser.add_argument('--weight_decay', type=float, default=0.0)
     parser.add_argument('--graph_pooling_type', type=str, default='mean', help='mean, sum, max, attention, set2set')
+    parser.add_argument('--use_class_weights', type=bool, default=False, action=argparse.BooleanOptionalAction, help='use class weights in the loss computation')
 
     args = parser.parse_args()
 
