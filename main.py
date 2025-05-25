@@ -40,7 +40,7 @@ def train(data_loader, model, optimizer, criterion, device, save_checkpoints, ch
         pred = output.argmax(dim=1)
 
         # store predictions and true labels
-        batch_size = data.y.size(0)
+        batch_size = data.num_graphs
         end_idx = start_idx + batch_size
         pred_labels[start_idx:end_idx] = pred
         true_labels[start_idx:end_idx] = data.y
@@ -60,6 +60,7 @@ def train(data_loader, model, optimizer, criterion, device, save_checkpoints, ch
 def evaluate(data_loader, model, device, calculate_accuracy=False):
 
     model.eval()
+    
     total_loss = 0
     criterion = torch.nn.CrossEntropyLoss()  # use NoisyCrossEntropy?
 
@@ -78,13 +79,14 @@ def evaluate(data_loader, model, device, calculate_accuracy=False):
             output = model(data)
 
             pred = output.argmax(dim=1)
-            total_loss += criterion(output, data.y).item()
 
-            # store predictions and true labels
-            batch_size = data.y.size(0)
+            batch_size = data.num_graphs
             end_idx = start_idx + batch_size
             pred_labels[start_idx:end_idx] = pred
-            true_labels[start_idx:end_idx] = data.y
+            if calculate_accuracy:
+                total_loss += criterion(output, data.y).item()
+                true_labels[start_idx:end_idx] = data.y
+            
             start_idx = end_idx
 
     if calculate_accuracy:
