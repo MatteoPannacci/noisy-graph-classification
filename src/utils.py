@@ -3,6 +3,7 @@ import random
 import numpy as np
 import tarfile
 import os
+from src.loadData import GraphDataset
 
 def set_seed(seed=777):
     seed = seed
@@ -14,7 +15,6 @@ def set_seed(seed=777):
     if torch.cuda.is_available():
         torch.cuda.manual_seed(seed)
         torch.cuda.manual_seed_all(seed)
-
 
 
 def gzip_folder(folder_path, output_file):
@@ -29,7 +29,22 @@ def gzip_folder(folder_path, output_file):
         tar.add(folder_path, arcname=os.path.basename(folder_path))
     print(f"Folder '{folder_path}' has been compressed into '{output_file}'")
 
+
 # Example usage
 # folder_path = "./testfolder/submission"            # Path to the folder you want to compress
 # output_file = "./testfolder/submission.gz"         # Output .gz file name
 # gzip_folder(folder_path, output_file)
+
+
+def compute_label_distribution(dataset_path):
+
+    dataset = GraphDataset(dataset_path, transform=add_zeros)
+    loader = DataLoader(dataset, batch_size=32, shuffle=False)
+
+    counters = [0 for _ in range(6)]
+
+    for batch in loader:
+        for item in batch:
+            counters[item.y] += 1
+    
+    print(counters)
