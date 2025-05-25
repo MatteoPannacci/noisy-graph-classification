@@ -27,8 +27,8 @@ def train(data_loader, model, optimizer, criterion, device, save_checkpoints, ch
     model.train()
     total_loss = 0
 
-    f1_metric = F1Score(task="multiclass", num_classes=6, average='macro')
-    accuracy_metric = Accuracy(task="multiclass", num_classes=6)
+    f1_metric = F1Score(task="multiclass", num_classes=6, average='macro').to(device)
+    accuracy_metric = Accuracy(task="multiclass", num_classes=6).to(device)
 
     pred_labels = torch.empty(len(data_loader.dataset), device=device)
     true_labels = torch.empty(len(data_loader.dataset), device=device)
@@ -71,8 +71,8 @@ def evaluate(data_loader, model, device, calculate_accuracy=False):
     total_loss = 0
     criterion = torch.nn.CrossEntropyLoss()  # use NoisyCrossEntropy?
 
-    f1_metric = F1Score(task="multiclass", num_classes=6, average='macro')
-    accuracy_metric = Accuracy(task="multiclass", num_classes=6)
+    f1_metric = F1Score(task="multiclass", num_classes=6, average='macro').to(device)
+    accuracy_metric = Accuracy(task="multiclass", num_classes=6).to(device)
 
     pred_labels = torch.empty(len(data_loader.dataset), device=device)
     true_labels = torch.empty(len(data_loader.dataset), device=device)
@@ -292,7 +292,8 @@ def main(args):
 
         # Plot training progress in current directory
         plot_progress("Training", train_losses, train_accuracies, train_f1s, os.path.join(logs_folder, "plots"))
-        plot_progress("Validation", val_losses, val_accuracies, val_f1s, os.path.join(logs_folder, "plotsVal"))
+        if use_validation:
+            plot_progress("Validation", val_losses, val_accuracies, val_f1s, os.path.join(logs_folder, "plotsVal"))
 
         # DELETE TRAIN DATASET VARIABLES
         if use_validation:
