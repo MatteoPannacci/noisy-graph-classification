@@ -133,6 +133,13 @@ def plot_progress(split_name, losses, accuracies, f1_scores, output_dir):
     plt.ylabel('Accuracy')
     plt.title(f'{split_name} Accuracy per Epoch')
 
+    # Plot f1 score
+    plt.subplot(1, 2, 2)
+    plt.plot(epochs, f1_scores, label=f"{split_name} F1 Score", color='green')
+    plt.xlabel('Epoch')
+    plt.ylabel('F1 Score')
+    plt.title(f'{split_name} F1 Score per Epoch')
+
     # Save plots in the current directory
     os.makedirs(output_dir, exist_ok=True)
     plt.tight_layout()
