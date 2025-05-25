@@ -15,11 +15,6 @@ from torchmetrics.classification import F1Score
 from src.models import GNN 
 
 
-def add_zeros(data):
-    data.x = torch.zeros(data.num_nodes, dtype=torch.long)
-    return data
-
-
 def train(data_loader, model, optimizer, criterion, device, save_checkpoints, checkpoint_path, current_epoch):
 
     model.train()

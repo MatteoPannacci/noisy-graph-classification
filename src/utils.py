@@ -5,6 +5,12 @@ import tarfile
 import os
 from src.loadData import GraphDataset
 
+
+def add_zeros(data):
+    data.x = torch.zeros(data.num_nodes, dtype=torch.long)
+    return data
+
+
 def set_seed(seed=777):
     seed = seed
     torch.manual_seed(seed)
