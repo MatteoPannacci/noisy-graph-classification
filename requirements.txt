@@ -1,5 +1,6 @@
-torch==2.0.1      
-torch-geometric  
+torch==2.0.1
+torchmetrics
+torch-geometric
 numpy
 matplotlib
 pandas

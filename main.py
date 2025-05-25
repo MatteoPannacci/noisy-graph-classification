@@ -11,6 +11,8 @@ import logging
 from tqdm import tqdm
 import gc
 from torch.utils.data import random_split
+from torchmetrics.classification import Accuracy
+from torchmetrics.classification import F1Score
 
 from src.models import GNN 
 
@@ -24,56 +26,82 @@ def train(data_loader, model, optimizer, criterion, device, save_checkpoints, ch
 
     model.train()
     total_loss = 0
-    correct = 0
-    total = 0
+
+    f1_metric = F1Score(task="multiclass", num_classes=6, average='macro')
+    accuracy_metric = Accuracy(task="multiclass", num_classes=6)
+
+    pred_labels = torch.empty(len(data_loader.dataset), device=device)
+    true_labels = torch.empty(len(data_loader.dataset), device=device)
+    start_idx = 0
 
     for data in tqdm(data_loader, desc="Iterating training graphs", unit="batch"):
+
+        # optimization
         data = data.to(device)
         optimizer.zero_grad()
         output = model(data)
         loss = criterion(output, data.y)
         loss.backward()
         optimizer.step()
+
         total_loss += loss.item()
         pred = output.argmax(dim=1)
-        correct += (pred == data.y).sum().item()
-        total += data.y.size(0)
+
+        # store predictions and true labels
+        batch_size = data.y.size(0)
+        end_idx = start_idx + batch_size
+        pred_labels[start_idx:end_idx] = pred
+        true_labels[start_idx:end_idx] = data.y
+        start_idx = end_idx
 
     if save_checkpoints:
         checkpoint_file = f"{checkpoint_path}_epoch_{current_epoch + 1}.pth"
         torch.save(model.state_dict(), checkpoint_file)
         print(f"Checkpoint saved at {checkpoint_file}")
 
-    return total_loss / len(data_loader),  correct / total
+    f1_score = f1_metric(pred_labels, true_labels)
+    accuracy = accuracy_metric(pred_labels, true_labels)
+
+    return total_loss / len(data_loader), accuracy, f1_score
 
 
 def evaluate(data_loader, model, device, calculate_accuracy=False):
 
     model.eval()
-    correct = 0
-    total = 0
-    predictions = []
     total_loss = 0
     criterion = torch.nn.CrossEntropyLoss()  # use NoisyCrossEntropy?
+
+    f1_metric = F1Score(task="multiclass", num_classes=6, average='macro')
+    accuracy_metric = Accuracy(task="multiclass", num_classes=6)
+
+    pred_labels = torch.empty(len(data_loader.dataset), device=device)
+    true_labels = torch.empty(len(data_loader.dataset), device=device)
+    start_idx = 0
 
     with torch.no_grad():
 
         for data in tqdm(data_loader, desc="Iterating eval graphs", unit="batch"):
+
             data = data.to(device)
             output = model(data)
+
             pred = output.argmax(dim=1)
-            if calculate_accuracy:
-                correct += (pred == data.y).sum().item()
-                total += data.y.size(0)
-                total_loss += criterion(output, data.y).item()
-            else:
-                predictions.extend(pred.cpu().numpy())
+            total_loss += criterion(output, data.y).item()
+
+            # store predictions and true labels
+            batch_size = data.y.size(0)
+            end_idx = start_idx + batch_size
+            pred_labels[start_idx:end_idx] = pred
+            true_labels[start_idx:end_idx] = data.y
+            start_idx = end_idx
 
     if calculate_accuracy:
-        accuracy = correct / total
-        return  total_loss / len(data_loader), accuracy
+        f1_score = f1_metric(pred_labels, true_labels)
+        accuracy = accuracy_metric(pred_labels, true_labels)
+        return  total_loss / len(data_loader), accuracy, f1_score
 
-    return predictions
+    else:
+        return pred_labels.cpu().numpy()
 
 
 def save_predictions(predictions, test_path):
@@ -94,7 +122,7 @@ def save_predictions(predictions, test_path):
     print(f"Predictions saved to {output_csv_path}")
 
 
-def plot_progress(split_name, losses, accuracies, output_dir):
+def plot_progress(split_name, losses, accuracies, f1_scores, output_dir):
     epochs = range(1, len(losses) + 1)
     plt.figure(figsize=(12, 6))
 
@@ -212,8 +240,10 @@ def main(args):
 
         train_losses = []
         train_accuracies = []
+        train_f1s = []
         val_losses = []
         val_accuracies = []
+        val_f1s = []
 
         # Calculate intervals for saving checkpoints
         if num_checkpoints > 1:
@@ -225,7 +255,7 @@ def main(args):
         for epoch in range(num_epochs):
 
             # train
-            train_loss, train_acc = train(
+            train_loss, train_acc, train_f1 = train(
                 train_loader, model, optimizer, criterion, device,
                 save_checkpoints=(epoch + 1 in checkpoint_intervals),
                 checkpoint_path=os.path.join(checkpoints_folder, f"model_{test_dir_name}"),
@@ -234,23 +264,24 @@ def main(args):
 
             # validation
             if use_validation:
-                val_loss, val_acc = evaluate(val_loader, model, device, calculate_accuracy=True)
+                val_loss, val_acc, val_f1 = evaluate(val_loader, model, device, calculate_accuracy=True)
                 val_losses.append(val_loss)
                 val_accuracies.append(val_acc)
+                val_f1s.append(val_f1)
             else:
-                _, train_acc = evaluate(train_loader, model, device, calculate_accuracy=True)
+                _, train_acc, train_f1 = evaluate(train_loader, model, device, calculate_accuracy=True)
 
             train_losses.append(train_loss)
             train_accuracies.append(train_acc)
+            train_f1s.append(train_f1)
 
             # Save logs for training progress
+            logger.info(f"Epoch {epoch + 1}/{num_epochs}, Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, Train F1: {train_f1:.4f}")
             if use_validation:
-                logger.info(f"Epoch {epoch + 1}/{num_epochs}, Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, Val Acc: {val_acc:.4f}")
-            else:
-                logger.info(f"Epoch {epoch + 1}/{num_epochs}, Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}")
+                logger.info(f"Val Acc: {val_acc:.4f}, Val F1: {val_f1:.4f}")
 
             # Save best model
-            if (use_validation and val_acc > best_accuracy):
+            if (use_validation and val_acc > best_accuracy): # use f1 score instead?
                 best_accuracy = val_acc
                 torch.save(model.state_dict(), checkpoint_path)
                 logger.info(f"Best model updated and saved at {checkpoint_path}")
@@ -260,8 +291,8 @@ def main(args):
                 logger.info(f"Best model updated and saved at {checkpoint_path}")
 
         # Plot training progress in current directory
-        plot_progress("Training", train_losses, train_accuracies, os.path.join(logs_folder, "plots"))
-        plot_progress("Validation", val_losses, val_accuracies, os.path.join(logs_folder, "plotsVal"))
+        plot_progress("Training", train_losses, train_accuracies, train_f1s, os.path.join(logs_folder, "plots"))
+        plot_progress("Validation", val_losses, val_accuracies, val_f1s, os.path.join(logs_folder, "plotsVal"))
 
         # DELETE TRAIN DATASET VARIABLES
         if use_validation:
