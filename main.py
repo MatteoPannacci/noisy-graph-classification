@@ -4,7 +4,6 @@ import torch
 from torch_geometric.loader import DataLoader
 from src import *
 import pandas as pd
-import matplotlib.pyplot as plt
 import logging
 from tqdm import tqdm
 import gc
@@ -245,9 +244,12 @@ def main(args):
             train_f1s.append(train_f1)
 
             # Save logs for training progress
-            logger.info(f"Epoch {epoch + 1}/{num_epochs}, Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, Train F1: {train_f1:.4f}")
+            logger.info("---")
+            logger.info(f"Epoch {epoch + 1:0{len(str(num_epochs))}d}/{num_epochs}")
+            logger.info(f"Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.4f}, Train F1: {train_f1:.4f}")
             if use_validation:
                 logger.info(f"Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.4f}, Val F1: {val_f1:.4f}")
+            logger.info("---")
 
             # Save best model
             if (use_validation and val_acc > best_accuracy): # use f1 score instead?
