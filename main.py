@@ -2,9 +2,7 @@ import argparse
 import os
 import torch
 from torch_geometric.loader import DataLoader
-from src.loadData import GraphDataset
-from src.utils import set_seed
-from src.losses import NoisyCrossEntropyLoss
+from src import *
 import pandas as pd
 import matplotlib.pyplot as plt
 import logging
