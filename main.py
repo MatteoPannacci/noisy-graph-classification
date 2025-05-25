@@ -51,8 +51,8 @@ def train(data_loader, model, optimizer, criterion, device, save_checkpoints, ch
         torch.save(model.state_dict(), checkpoint_file)
         print(f"Checkpoint saved at {checkpoint_file}")
 
-    f1_score = f1_metric(pred_labels, true_labels)
-    accuracy = accuracy_metric(pred_labels, true_labels)
+    f1_score = f1_metric(pred_labels, true_labels).item()
+    accuracy = accuracy_metric(pred_labels, true_labels).item()
 
     return total_loss / len(data_loader), accuracy, f1_score
 
@@ -88,8 +88,8 @@ def evaluate(data_loader, model, device, calculate_accuracy=False):
             start_idx = end_idx
 
     if calculate_accuracy:
-        f1_score = f1_metric(pred_labels, true_labels)
-        accuracy = accuracy_metric(pred_labels, true_labels)
+        f1_score = f1_metric(pred_labels, true_labels).item()
+        accuracy = accuracy_metric(pred_labels, true_labels).item()
         return  total_loss / len(data_loader), accuracy, f1_score
 
     else:
