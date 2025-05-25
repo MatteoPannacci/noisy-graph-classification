@@ -53,6 +53,7 @@ class GNN(torch.nn.Module):
         else:
             self.graph_pred_linear = torch.nn.Linear(self.emb_dim, self.num_class)
 
+
     def forward(self, batched_data):
         h_node = self.gnn_node(batched_data)
 
