@@ -135,7 +135,7 @@ def plot_progress(split_name, losses, accuracies, f1_scores, output_dir):
 
     # Plot f1 score
     plt.subplot(1, 3, 3)
-    plt.plot(epochs, f1_scores, label=f"{split_name} F1 Score", color='green')
+    plt.plot(epochs, f1_scores, label=f"{split_name} F1 Score", color='red')
     plt.xlabel('Epoch')
     plt.ylabel('F1 Score')
     plt.title(f'{split_name} F1 Score per Epoch')
