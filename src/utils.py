@@ -45,4 +45,4 @@ def compute_label_distribution(loader):
         for label in batch.y.tolist():
             counters[label] += 1
 
-    print(counters)
+    return counters
