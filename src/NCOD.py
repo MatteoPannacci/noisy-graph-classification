@@ -12,7 +12,7 @@ encoder_features =512
 total_epochs = 150
 
 class ncodLoss(nn.Module):
-    def __init__(self, labels, n=50000, C=100, ratio_consistency=0, ratio_balance=0, device):
+    def __init__(self, labels, n=50000, C=100, ratio_consistency=0, ratio_balance=0, device=None):
         super(ncodLoss, self).__init__()
 
         self.C = C
