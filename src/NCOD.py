@@ -36,6 +36,8 @@ class ncodLoss(nn.Module):
         for i in range(0, C):
             self.bins.append(np.where(self.labels == i)[0])
 
+        print(self.bins)
+
 
     def init_param(self, mean= 1e-8, std= 1e-9):
         torch.nn.init.normal_(self.u, mean=mean, std=std)
