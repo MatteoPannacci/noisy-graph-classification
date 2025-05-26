@@ -12,7 +12,7 @@ encoder_features =512
 total_epochs = 150
 
 class ncodLoss(nn.Module):
-    def __init__(self, labels, n=50000, C=100, ratio_consistency=0, ratio_balance=0):
+    def __init__(self, labels, n=50000, C=100, ratio_consistency=0, ratio_balance=0, device):
         super(ncodLoss, self).__init__()
 
         self.C = C
@@ -23,12 +23,12 @@ class ncodLoss(nn.Module):
         self.ratio_balance = ratio_balance
 
 
-        self.u = nn.Parameter(torch.empty(n, 1, dtype=torch.float32))
+        self.u = nn.Parameter(torch.empty(n, 1, dtype=torch.float32), device=device)
         self.init_param(mean=mean,std=std)
 
         self.beginning = True
-        self.prev_phi_x_i = torch.rand((n, encoder_features))
-        self.phi_c = torch.rand((C, encoder_features))
+        self.prev_phi_x_i = torch.rand((n, encoder_features), device=device)
+        self.phi_c = torch.rand((C, encoder_features), device=device)
         self.labels = labels
         self.bins = []
 
@@ -52,8 +52,6 @@ class ncodLoss(nn.Module):
         eps = 1e-4
 
         u = self.u[index]
-
-
 
         if (flag == 0):
             if self.beginning:
