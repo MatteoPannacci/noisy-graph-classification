@@ -222,14 +222,14 @@ def main(args):
             criterion = SymmetricCrossEntropyLoss(weight=class_weights)
         elif args.loss_type == 4:
 
-            train_labels = []
-            for batch in train_loader:
-                train_labels.append(batch.y)
-            train_labels = torch.cat(train_labels)
+            all_labels = []
+            for sample in full_dataset:
+                all_labels.append(sample.y)
+            all_labels = torch.cat(all_labels)
 
             criterion = ncodLoss(
-                labels = train_labels,
-                n = len(train_loader.dataset),
+                labels = all_labels,
+                n = len(full_dataset),
                 C = 6,
                 ratio_consistency = 0,
                 ratio_balance = 0,
