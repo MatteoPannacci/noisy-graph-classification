@@ -48,7 +48,7 @@ class ncodLoss(nn.Module):
         y = y.cpu()
         phi_x_i = phi_x_i.cpu()
 
-        y = F.one_hot(y)
+        y = F.one_hot(y, num_classes=self.C)
 
         if len(f_x_i) > len(index):
             f_x_i_1, f_x_i_2 = torch.chunk(f_x_i, 2)
