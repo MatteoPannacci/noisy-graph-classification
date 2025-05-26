@@ -57,7 +57,8 @@ class ncodLoss(nn.Module):
 
         eps = 1e-4
 
-        print(index)
+        print(f_x_i_1.shape)
+        print(phi_x_i_1.shape)
 
         u = self.u[index]
 
