@@ -43,12 +43,17 @@ class ncodLoss(nn.Module):
 
     def forward(self, index, f_x_i, y, phi_x_i, flag, epoch):
 
+        index = index.cpu()
+        f_x_i = f_x_i.cpu()
+        y = y.cpu()
+        phi_x_i = phi_x_i.cpu()
+
         if len(f_x_i) > len(index):
             f_x_i_1, f_x_i_2 = torch.chunk(f_x_i, 2)
             phi_x_i_1, phi_x_i_2 = torch.chunk(phi_x_i, 2)
         else:
-            f_x_i_1 = f_x_i.cpu()
-            phi_x_i_1 = phi_x_i.cpu()
+            f_x_i_1 = f_x_i
+            phi_x_i_1 = phi_x_i
 
         eps = 1e-4
 
