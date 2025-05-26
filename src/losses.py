@@ -44,3 +44,17 @@ class SymmetricCrossEntropyLoss(torch.nn.Module):
             rce_loss = rce_per_sample.mean()
 
         return ce_loss + rce_loss
+
+
+
+class GeneralizedCrossEntropyLoss(torch.nn.Module):
+
+        def init(self, q, weight=None):
+            super().init()
+            self.p = q
+
+        def forward(self, logits, targets):
+            probs = torch.nn.functional.softmax(logits, dim=1)
+            probs_correct = probs.gather(dim=1, index=targets.unsqueeze(1)).squeeze(1)
+            loss = (1 - probs_correct.pow(self.q)) / self.q
+            return loss.mean()
