@@ -139,7 +139,7 @@ class GNN_node(torch.nn.Module):
             for layer in range(self.num_layer + 1):
                 node_representation += h_list[layer]
 
-        return node_representation, h_list[1]
+        return node_representation
 
 
 
@@ -239,4 +239,4 @@ class GNN_node_Virtualnode(torch.nn.Module):
             for layer in range(self.num_layer + 1):
                 node_representation += h_list[layer]
 
-        return node_representation, h_list[1]
+        return node_representation

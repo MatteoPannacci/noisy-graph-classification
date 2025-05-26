@@ -55,8 +55,8 @@ class GNN(torch.nn.Module):
 
 
     def forward(self, batched_data):
-        h_node, phi = self.gnn_node(batched_data)
+        h_node = self.gnn_node(batched_data)
 
         h_graph = self.pool(h_node, batched_data.batch)
 
-        return self.graph_pred_linear(h_graph), phi.detach()
+        return self.graph_pred_linear(h_graph), h_graph
