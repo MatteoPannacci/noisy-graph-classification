@@ -14,9 +14,8 @@ class NoisyCrossEntropyLoss(torch.nn.Module):
     def forward(self, logits, targets):
         losses = self.ce(logits, targets)
         weights = (1 - self.p) + self.p * (1 - torch.nn.functional.one_hot(targets, num_classes=logits.size(1)).float().sum(dim=1))
-        print(weights)
-        assert False
         return (losses * weights).mean()
+
 
 
 class SymmetricCrossEntropyLoss(torch.nn.Module):
