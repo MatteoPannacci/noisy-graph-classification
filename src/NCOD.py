@@ -57,6 +57,8 @@ class ncodLoss(nn.Module):
 
         eps = 1e-4
 
+        print(index)
+
         u = self.u[index]
 
         if (flag == 0):
