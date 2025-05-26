@@ -224,7 +224,8 @@ def main(args):
                 n = len(train_loader.dataset), 
                 C = 6,
                 ratio_consistency = 0,
-                ratio_balance = 0
+                ratio_balance = 0,
+                device = device
             )
         else:
             raise ValueError("criterion not found")
