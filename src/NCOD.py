@@ -131,4 +131,4 @@ class ncodLoss(nn.Module):
 
     def soft_to_hard(self, x):
         with torch.no_grad():
-            return (torch.zeros(len(x), self.C)).cuda().scatter_(1, (x.argmax(dim=1)).view(-1, 1), 1)
+            return (torch.zeros(len(x), self.C)).scatter_(1, (x.argmax(dim=1)).view(-1, 1), 1)
