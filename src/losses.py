@@ -49,8 +49,8 @@ class SymmetricCrossEntropyLoss(torch.nn.Module):
 
 class GeneralizedCrossEntropyLoss(torch.nn.Module):
 
-    def init(self,q, weight=None):
-        super().init()
+    def __init__(self, q, weight=None):
+        super().__init__()
         self.q = q
 
     def forward(self, logits, targets):
