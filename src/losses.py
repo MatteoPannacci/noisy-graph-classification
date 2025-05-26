@@ -49,12 +49,12 @@ class SymmetricCrossEntropyLoss(torch.nn.Module):
 
 class GeneralizedCrossEntropyLoss(torch.nn.Module):
 
-        def init(self, q, weight=None):
-            super().init()
-            self.p = q
+    def init(self,q, weight=None):
+        super().init()
+        self.q = q
 
-        def forward(self, logits, targets):
-            probs = torch.nn.functional.softmax(logits, dim=1)
-            probs_correct = probs.gather(dim=1, index=targets.unsqueeze(1)).squeeze(1)
-            loss = (1 - probs_correct.pow(self.q)) / self.q
-            return loss.mean()
+    def forward(self, logits, targets):
+        probs = torch.nn.functional.softmax(logits, dim=1)
+        probs_correct = probs.gather(dim=1, index=targets.unsqueeze(1)).squeeze(1)
+        loss = (1 - probs_correct.pow(self.q)) / self.q
+        return loss.mean()
