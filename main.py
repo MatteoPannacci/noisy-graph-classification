@@ -227,6 +227,9 @@ def main(args):
                 train_labels.append(batch.y)
             train_labels = torch.cat(train_labels)
 
+            print(f"train labels num: {len(train_labels)}")
+            print(f"dataset dim: {len(train_loader.dataset)}")
+
             criterion = ncodLoss(
                 labels = train_labels,
                 n = len(train_loader.dataset),
@@ -237,6 +240,7 @@ def main(args):
                 encoder_features = args.emb_dim,
                 total_epochs = args.epochs
             )
+
         else:
             raise ValueError("criterion not found")
 
