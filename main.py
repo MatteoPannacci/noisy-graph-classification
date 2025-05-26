@@ -242,7 +242,7 @@ def main(args):
         # setup optimizer
         if args.loss_type == 4:
             optimizer = torch.optim.Adam(
-                list(model.parameters()) + list(criterion.u),
+                list(model.parameters()) + list(criterion.parameters),
                 lr=args.lr,
                 weight_decay=args.weight_decay
             )
