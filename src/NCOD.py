@@ -27,9 +27,6 @@ class ncodLoss(nn.Module):
         self.u = nn.Parameter(torch.empty(n, 1, dtype=torch.float32, device=self.device))
         self.init_param(mean=mean,std=std)
 
-        print(self.u.shape)
-        print(self.u)
-
         self.beginning = True
         self.prev_phi_x_i = torch.rand((n, self.encoder_features), device=self.device)
         self.phi_c = torch.rand((C, self.encoder_features), device=self.device)
@@ -57,6 +54,8 @@ class ncodLoss(nn.Module):
 
         u = self.u[index]
 
+        print("start")
+
         if (flag == 0):
             if self.beginning:
                 percent = math.ceil((50 - (50 / self.total_epochs) * epoch) + 50)
@@ -70,10 +69,10 @@ class ncodLoss(nn.Module):
 
             phi_c_norm = self.phi_c.norm(p=2, dim=1, keepdim=True)
             h_c_bar = self.phi_c.div(phi_c_norm)
-            self.h_c_bar_T = torch.transpose(h_c_bar, 0, 1)
+            self.h_c_bar_T = torch.transpose(h_c_bar, 0, 1).to(self.device)
             self.beginning = True
 
-        self.prev_phi_x_i[index] = phi_x_i_1.detach()
+        self.prev_phi_x_i[index] = phi_x_i_1.detach().to(self.device)
 
         f_x_softmax = F.softmax(f_x_i_1, dim=1)
 
