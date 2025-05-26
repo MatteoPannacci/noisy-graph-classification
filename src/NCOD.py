@@ -14,8 +14,8 @@ class ncodLoss(nn.Module):
         super(ncodLoss, self).__init__()
 
         self.C = C
+        self.USE_CUDA = torch.cuda.is_available()
         self.n = n
-        self.device = device
 
         self.encoder_features = encoder_features
         self.total_epochs = total_epochs
@@ -24,17 +24,17 @@ class ncodLoss(nn.Module):
         self.ratio_balance = ratio_balance
 
 
-        self.u = nn.Parameter(torch.empty(n, 1, dtype=torch.float32, device=self.device))
+        self.u = nn.Parameter(torch.empty(n, 1, dtype=torch.float32))
         self.init_param(mean=mean,std=std)
 
         self.beginning = True
-        self.prev_phi_x_i = torch.rand((n, self.encoder_features), device=self.device)
-        self.phi_c = torch.rand((C, self.encoder_features), device=self.device)
-        self.labels = labels
+        self.prev_phi_x_i = torch.rand((n, self.encoder_features))
+        self.phi_c = torch.rand((C, self.encoder_features))
+        self.labels = labels.cpu()
         self.bins = []
 
         for i in range(0, C):
-            self.bins.append(torch.tensor(np.where(self.labels == i)[0], device=self.device, dtype=int))
+            self.bins.append(np.where(self.labels == i)[0])
 
 
     def init_param(self, mean= 1e-8, std= 1e-9):
@@ -47,34 +47,29 @@ class ncodLoss(nn.Module):
             f_x_i_1, f_x_i_2 = torch.chunk(f_x_i, 2)
             phi_x_i_1, phi_x_i_2 = torch.chunk(phi_x_i, 2)
         else:
-            f_x_i_1 = f_x_i
-            phi_x_i_1 = phi_x_i
+            f_x_i_1 = f_x_i.cpu()
+            phi_x_i_1 = phi_x_i.cpu()
 
         eps = 1e-4
 
         u = self.u[index]
 
-        print("start")
-
         if (flag == 0):
             if self.beginning:
                 percent = math.ceil((50 - (50 / self.total_epochs) * epoch) + 50)
                 for i in range(0, len(self.bins)):
-                    class_u = self.u.detach()[self.bins[i]].to(self.device)
+                    class_u = self.u.detach()[self.bins[i]]
                     bottomK = int((len(class_u) / 100) * percent)
                     important_indexs = torch.topk(class_u, bottomK, largest=False, dim=0)[1]
-                    important_indexs = important_indexs.view(-1)
-                    important_indexs = important_indexs.to(self.device)
-                    prev_phi = self.prev_phi_x_i[self.bins[i]][important_indexs].to(self.device)
-
-                    self.phi_c[i] = torch.mean(prev_phi, dim=0).to(self.device)
+                    self.phi_c[i] = torch.mean(self.prev_phi_x_i[self.bins[i]][important_indexs.view(-1)],
+                                                      dim=0)
 
             phi_c_norm = self.phi_c.norm(p=2, dim=1, keepdim=True)
             h_c_bar = self.phi_c.div(phi_c_norm)
-            self.h_c_bar_T = torch.transpose(h_c_bar, 0, 1).to(self.device)
+            self.h_c_bar_T = torch.transpose(h_c_bar, 0, 1)
             self.beginning = True
 
-        self.prev_phi_x_i[index] = phi_x_i_1.detach().to(self.device)
+        self.prev_phi_x_i[index] = phi_x_i_1.detach()
 
         f_x_softmax = F.softmax(f_x_i_1, dim=1)
 
