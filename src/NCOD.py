@@ -25,7 +25,7 @@ class ncodLoss(nn.Module):
         self.ratio_balance = ratio_balance
 
 
-        self.u = nn.Parameter(torch.empty(n, 1, dtype=torch.float32), requires_grad=True)
+        self.u = nn.Parameter(torch.empty(n, 1, dtype=torch.float32, requires_grad=True))
         self.init_param(mean=mean,std=std)
 
         self.beginning = True
