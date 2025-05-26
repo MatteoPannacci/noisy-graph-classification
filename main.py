@@ -197,6 +197,7 @@ def main(args):
         if args.use_class_weights:
             class_weights = (1.0 / torch.tensor(compute_label_distribution(train_loader), dtype=torch.float, device=device))
             class_weights = class_weights * len(class_weights) / class_weights.sum()
+            print(f"class weights: {class_weights}")
         else:
             class_weights = None
 
