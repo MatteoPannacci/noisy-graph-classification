@@ -226,8 +226,8 @@ def main(args):
                 labels = all_labels,
                 n = len(full_dataset),
                 C = 6,
-                ratio_consistency = 0,
-                ratio_balance = 0,
+                ratio_consistency = 0.2,
+                ratio_balance = 0.2,
                 device = device,
                 encoder_features = args.emb_dim,
                 total_epochs = args.epochs
