@@ -21,6 +21,7 @@ class NoisyCrossEntropyLoss(torch.nn.Module):
 class SymmetricCrossEntropyLoss(torch.nn.Module):
     def __init__(self, weight=None):
         super().__init__()
+        self.weight = weight
         self.ce = torch.nn.CrossEntropyLoss(weight=weight)
 
     def forward(self, logits, targets):
