@@ -5,10 +5,10 @@ import torch.nn.functional
 
 class NoisyCrossEntropyLoss(torch.nn.Module):
 
-    def __init__(self, p_noisy):
+    def __init__(self, p_noisy, weight=None):
         super().__init__()
         self.p = p_noisy
-        self.ce = torch.nn.CrossEntropyLoss(reduction='none')
+        self.ce = torch.nn.CrossEntropyLoss(reduction='none', weight=weight)
 
 
     def forward(self, logits, targets):
