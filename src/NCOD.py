@@ -27,6 +27,9 @@ class ncodLoss(nn.Module):
         self.u = nn.Parameter(torch.empty(n, 1, dtype=torch.float32, device=device))
         self.init_param(mean=mean,std=std)
 
+        print(u.shape)
+        print(u)
+
         self.beginning = True
         self.prev_phi_x_i = torch.rand((n, self.encoder_features), device=device)
         self.phi_c = torch.rand((C, self.encoder_features), device=device)
@@ -35,8 +38,6 @@ class ncodLoss(nn.Module):
 
         for i in range(0, C):
             self.bins.append(np.where(self.labels == i)[0])
-
-        print(self.bins)
 
 
     def init_param(self, mean= 1e-8, std= 1e-9):
