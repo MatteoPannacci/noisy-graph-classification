@@ -10,6 +10,7 @@ mean = 1e-8
 std = 1e-9
 
 class ncodLoss(nn.Module):
+
     def __init__(self, labels, n=50000, C=100, ratio_consistency=0, ratio_balance=0, device=None, encoder_features=300, total_epochs=100):
         super(ncodLoss, self).__init__()
 
@@ -24,7 +25,7 @@ class ncodLoss(nn.Module):
         self.ratio_balance = ratio_balance
 
 
-        self.u = nn.Parameter(torch.empty(n, 1, dtype=torch.float32))
+        self.u = nn.Parameter(torch.empty(n, 1))
         self.init_param(mean=mean,std=std)
 
         self.beginning = True
@@ -71,8 +72,7 @@ class ncodLoss(nn.Module):
                     class_u = self.u.detach()[self.bins[i]]
                     bottomK = int((len(class_u) / 100) * percent)
                     important_indexs = torch.topk(class_u, bottomK, largest=False, dim=0)[1]
-                    self.phi_c[i] = torch.mean(self.prev_phi_x_i[self.bins[i]][important_indexs.view(-1)],
-                                                      dim=0)
+                    self.phi_c[i] = torch.mean(self.prev_phi_x_i[self.bins[i]][important_indexs.view(-1)], dim=0)
 
             phi_c_norm = self.phi_c.norm(p=2, dim=1, keepdim=True)
             h_c_bar = self.phi_c.div(phi_c_norm)
@@ -88,7 +88,7 @@ class ncodLoss(nn.Module):
 
         y_bar = torch.mm(h_i, self.h_c_bar_T)
         y_bar = y_bar * y
-        y_bar_max = (y_bar > 0.000).type(torch.float32)
+        y_bar_max = (y_bar > 0.000)
         y_bar = y_bar * y_bar_max
 
         u = u * y
@@ -100,8 +100,6 @@ class ncodLoss(nn.Module):
 
         L2 = F.mse_loss((y_hat + u), y, reduction='sum') / len(y)
         L1 += L2
-
-
 
         if self.ratio_balance > 0:
             avg_prediction = torch.mean(f_x_softmax, dim=0)
@@ -118,7 +116,6 @@ class ncodLoss(nn.Module):
 
             L1 += self.ratio_consistency * torch.mean(consistency_loss)
 
-
         return L1
 
 
@@ -128,6 +125,7 @@ class ncodLoss(nn.Module):
         loss_kldiv = F.kl_div(preds2, preds1, reduction='none')
         loss_kldiv = torch.sum(loss_kldiv, dim=1)
         return loss_kldiv
+
 
     def soft_to_hard(self, x):
         with torch.no_grad():
