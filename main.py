@@ -25,14 +25,22 @@ def train(data_loader, model, optimizer, criterion, device, save_checkpoints, ch
     pred_labels = torch.empty(len(data_loader.dataset), device=device)
     true_labels = torch.empty(len(data_loader.dataset), device=device)
     start_idx = 0
+    batch_counter = 0
 
     for data in tqdm(data_loader, desc="Iterating training graphs", unit="batch"):
 
         # optimization
         data = data.to(device)
         optimizer.zero_grad()
-        output = model(data)
-        loss = criterion(output, data.y)
+        output, phi = model(data)
+
+        print(data.id)
+
+        if type(loss) == ncodLoss:
+            loss = criterion(data.id, output, data.y, phi, batch_counter, current_epoch)
+        else:
+            loss = criterion(output, data.y)
+
         loss.backward()
         optimizer.step()
 
@@ -45,6 +53,7 @@ def train(data_loader, model, optimizer, criterion, device, save_checkpoints, ch
         pred_labels[start_idx:end_idx] = pred
         true_labels[start_idx:end_idx] = data.y
         start_idx = end_idx
+        batch_counter += 1
 
     if save_checkpoints:
         checkpoint_file = f"{checkpoint_path}_epoch_{current_epoch + 1}.pth"
@@ -76,7 +85,7 @@ def evaluate(data_loader, model, device, calculate_accuracy=False):
         for data in tqdm(data_loader, desc="Iterating eval graphs", unit="batch"):
 
             data = data.to(device)
-            output = model(data)
+            output, _ = model(data)
 
             pred = output.argmax(dim=1)
 
@@ -211,6 +220,14 @@ def main(args):
             criterion = NoisyCrossEntropyLoss(args.noise_prob, weight=class_weights)
         elif args.loss_type == 3:
             criterion = SymmetricCrossEntropyLoss(weight=class_weights)
+        elif args.loss_type == 4:
+            criterion = ncodLoss(
+                labels = [i for i in range(6)], 
+                n = len(train_loader.dataset), 
+                C = 6,
+                ratio_consistency = 0,
+                ratio_balance = 0
+            )
         else:
             raise ValueError("criterion not found")
 
@@ -321,7 +338,7 @@ if __name__ == "__main__":
     parser.add_argument('--batch_size', type=int, default=32, help='input batch size for training (default: 32)')
     parser.add_argument('--epochs', type=int, default=10, help='number of epochs to train (default: 10)')
     parser.add_argument('--seed', type=int, default=42, help='random seed')
-    parser.add_argument('--loss_type', type=int, default=1, help='[1]: CrossEntropy; [2]: NoisyCrossEntropy; [3] SymmetricCrossEntropy')
+    parser.add_argument('--loss_type', type=int, default=1, help='[1]: CrossEntropy; [2]: NoisyCrossEntropy; [3] SymmetricCrossEntropy: [4] NCOD')
     parser.add_argument('--noise_prob', type=float, default=0.2)
     parser.add_argument('--lr', type=float, default=0.001, help='optimizer learning rate')
     parser.add_argument('--weight_decay', type=float, default=0.0)

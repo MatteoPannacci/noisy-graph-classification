@@ -18,7 +18,7 @@ class GraphDataset(Dataset):
     
 
     def get(self, idx):
-        return dictToGraphObject(self.graphs_dicts[idx])
+        return dictToGraphObject(self.graphs_dicts[idx], idx)
 
 
     def _count_graphs(self):
@@ -28,12 +28,12 @@ class GraphDataset(Dataset):
 
 
 
-def dictToGraphObject(graph_dict):
+def dictToGraphObject(graph_dict, idx):
     edge_index = torch.tensor(graph_dict["edge_index"], dtype=torch.long)
     edge_attr = torch.tensor(graph_dict["edge_attr"], dtype=torch.float) if graph_dict["edge_attr"] else None
     num_nodes = graph_dict["num_nodes"]
     y = torch.tensor(graph_dict["y"][0], dtype=torch.long) if graph_dict["y"] is not None else None
-    return Data(edge_index=edge_index, edge_attr=edge_attr, num_nodes=num_nodes, y=y)
+    return Data(edge_index=edge_index, edge_attr=edge_attr, num_nodes=num_nodes, y=y, id=idx)
 
 
 
