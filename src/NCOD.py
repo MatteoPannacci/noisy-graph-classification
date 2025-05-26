@@ -24,20 +24,20 @@ class ncodLoss(nn.Module):
         self.ratio_balance = ratio_balance
 
 
-        self.u = nn.Parameter(torch.empty(n, 1, dtype=torch.float32, device=device))
+        self.u = nn.Parameter(torch.empty(n, 1, dtype=torch.float32, device=self.device))
         self.init_param(mean=mean,std=std)
 
         print(self.u.shape)
         print(self.u)
 
         self.beginning = True
-        self.prev_phi_x_i = torch.rand((n, self.encoder_features), device=device)
-        self.phi_c = torch.rand((C, self.encoder_features), device=device)
+        self.prev_phi_x_i = torch.rand((n, self.encoder_features), device=self.device)
+        self.phi_c = torch.rand((C, self.encoder_features), device=self.device)
         self.labels = labels
         self.bins = []
 
         for i in range(0, C):
-            self.bins.append(torch.tensor(np.where(self.labels == i)[0], device=device, dtype=int))
+            self.bins.append(torch.tensor(np.where(self.labels == i)[0], device=self.device, dtype=int))
 
 
     def init_param(self, mean= 1e-8, std= 1e-9):
@@ -64,9 +64,9 @@ class ncodLoss(nn.Module):
                     class_u = self.u.detach()[self.bins[i]]
                     bottomK = int((len(class_u) / 100) * percent)
                     important_indexs = torch.topk(class_u, bottomK, largest=False, dim=0)[1]
-                    important_indexs = important_indexs.to(device)
+                    important_indexs = important_indexs.to(self.device)
                     self.phi_c[i] = torch.mean(self.prev_phi_x_i[self.bins[i]][important_indexs.view(-1)],
-                                                      dim=0).to(device)
+                                                      dim=0).to(self.device)
 
             phi_c_norm = self.phi_c.norm(p=2, dim=1, keepdim=True)
             h_c_bar = self.phi_c.div(phi_c_norm)
