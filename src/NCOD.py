@@ -63,9 +63,9 @@ class ncodLoss(nn.Module):
                 for i in range(0, len(self.bins)):
                     class_u = self.u.detach()[self.bins[i]]
                     bottomK = int((len(class_u) / 100) * percent)
-                    important_indexs = torch.topk(class_u, bottomK, largest=False, dim=0, device=self.device)[1]
+                    important_indexs = torch.topk(class_u, bottomK, largest=False, dim=0)[1].to(device)
                     self.phi_c[i] = torch.mean(self.prev_phi_x_i[self.bins[i]][important_indexs.view(-1)],
-                                                      dim=0, device=self.device)
+                                                      dim=0).to(device)
 
             phi_c_norm = self.phi_c.norm(p=2, dim=1, keepdim=True)
             h_c_bar = self.phi_c.div(phi_c_norm)
