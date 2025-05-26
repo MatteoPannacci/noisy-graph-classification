@@ -65,8 +65,9 @@ class ncodLoss(nn.Module):
                     important_indexs = torch.topk(class_u, bottomK, largest=False, dim=0)[1]
                     important_indexs = important_indexs.view(-1)
                     important_indexs = important_indexs.to(self.device)
+                    prev_phi = prev_phi_x_i[self.bins[i]][important_indexs]
 
-                    self.phi_c[i] = torch.mean(self.prev_phi_x_i[self.bins[i]][important_indexs], dim=0).to(self.device)
+                    self.phi_c[i] = torch.mean(prev_phi, dim=0).to(self.device)
 
             phi_c_norm = self.phi_c.norm(p=2, dim=1, keepdim=True)
             h_c_bar = self.phi_c.div(phi_c_norm)
