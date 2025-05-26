@@ -208,9 +208,6 @@ def main(args):
         else:
             class_weights = None
 
-        # setup optimizer
-        optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
-
         # choose loss type
         if args.loss_type == 1:
             criterion = torch.nn.CrossEntropyLoss(weight=class_weights)
@@ -241,6 +238,16 @@ def main(args):
 
         else:
             raise ValueError("criterion not found")
+
+        # setup optimizer
+        if args.loss_type == 4:
+            optimizer = torch.optim.Adam(
+                list(model.parameters()) + list(criterion.u),
+                lr=args.lr,
+                weight_decay=args.weight_decay
+            )
+        else:
+            optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
         num_epochs = args.epochs
         best_accuracy = 0.0
