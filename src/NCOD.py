@@ -37,7 +37,7 @@ class ncodLoss(nn.Module):
         self.bins = []
 
         for i in range(0, C):
-            self.bins.append(torch.tensor(np.where(self.labels == i)[0], device=device, type=int))
+            self.bins.append(torch.tensor(np.where(self.labels == i)[0], device=device, dtype=int))
 
 
     def init_param(self, mean= 1e-8, std= 1e-9):
