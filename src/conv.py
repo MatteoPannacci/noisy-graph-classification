@@ -1,10 +1,13 @@
 import torch
+from torch.nn import Linear, Parameter
 from torch_geometric.nn import MessagePassing
 import torch.nn.functional as F
 from torch_geometric.nn import global_mean_pool, global_add_pool
-from torch_geometric.utils import degree
+from torch_geometric.utils import degree, softmax
 
 import math
+
+
 
 ### GIN convolution along the graph structure
 class GINConv(MessagePassing):
@@ -31,6 +34,8 @@ class GINConv(MessagePassing):
 
     def update(self, aggr_out):
         return aggr_out
+
+
 
 ### GCN convolution along the graph structure
 class GCNConv(MessagePassing):
@@ -61,6 +66,57 @@ class GCNConv(MessagePassing):
 
     def update(self, aggr_out):
         return aggr_out
+
+
+
+class GATConv(MessagePassing):
+    def __init__(self, emb_dim, heads=1, concat=True):
+        super(GATConv, self).__init__(aggr='add')
+
+        self.emb_dim = emb_dim
+        self.heads = heads
+        self.concat = concat
+        self.out_dim = emb_dim // heads if concat else emb_dim
+
+        self.lin = Linear(emb_dim, heads * self.out_dim, bias=False)
+        self.edge_encoder = Linear(7, heads * self.out_dim)
+
+        self.att = Parameter(torch.Tensor(1, heads, 2 * self.out_dim))
+        self.bias = Parameter(torch.Tensor(emb_dim))
+
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        torch.nn.init.xavier_uniform_(self.lin.weight)
+        torch.nn.init.xavier_uniform_(self.edge_encoder.weight)
+        torch.nn.init.xavier_uniform_(self.att)
+        torch.nn.init.zeros_(self.bias)
+
+    def forward(self, x, edge_index, edge_attr):
+        x = self.lin(x)  # (N, heads*out_dim)
+        edge_embedding = self.edge_encoder(edge_attr)  # (E, heads*out_dim)
+
+        x = x.view(-1, self.heads, self.out_dim)
+        edge_embedding = edge_embedding.view(-1, self.heads, self.out_dim)
+
+        return self.propagate(edge_index, x=x, edge_attr=edge_embedding)
+
+    def message(self, x_i, x_j, edge_attr, index, ptr, size_i):
+        # Compute attention scores
+        cat = torch.cat([x_i, x_j + edge_attr], dim=-1)  # (E, heads, 2*out_dim)
+        alpha = (cat * self.att).sum(dim=-1)  # (E, heads)
+        alpha = F.leaky_relu(alpha, negative_slope=0.2)
+        alpha = softmax(alpha, index, ptr, size_i)  # (E, heads)
+
+        return (x_j + edge_attr) * alpha.unsqueeze(-1)  # (E, heads, out_dim)
+
+    def update(self, aggr_out):
+        if self.concat:
+            aggr_out = aggr_out.view(-1, self.heads * self.out_dim)
+        else:
+            aggr_out = aggr_out.mean(dim=1)
+        return aggr_out + self.bias
+
 
 
 ### GNN to generate node embedding
@@ -97,6 +153,8 @@ class GNN_node(torch.nn.Module):
                 self.convs.append(GINConv(emb_dim))
             elif gnn_type == 'gcn':
                 self.convs.append(GCNConv(emb_dim))
+            elif gnn_type == 'gat':
+                self.convs.append(GATConv(emb_dim))
             else:
                 raise ValueError('Undefined GNN type called {}'.format(gnn_type))
 
@@ -134,6 +192,7 @@ class GNN_node(torch.nn.Module):
                 node_representation += h_list[layer]
 
         return node_representation
+
 
 
 ### Virtual GNN to generate node embedding
@@ -176,6 +235,8 @@ class GNN_node_Virtualnode(torch.nn.Module):
                 self.convs.append(GINConv(emb_dim))
             elif gnn_type == 'gcn':
                 self.convs.append(GCNConv(emb_dim))
+            elif gnn_type == 'gat':
+                self.convs.append(GATConv(emb_dim))
             else:
                 raise ValueError('Undefined GNN type called {}'.format(gnn_type))
 

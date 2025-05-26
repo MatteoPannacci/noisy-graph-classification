@@ -312,7 +312,7 @@ if __name__ == "__main__":
     parser.add_argument("--test_path", type=str, required=True, help="Path to the test dataset.")
     parser.add_argument("--num_checkpoints", type=int, help="Number of checkpoints to save during training.")
     parser.add_argument('--device', type=int, default=1, help='which gpu to use if any (default: 0)')
-    parser.add_argument('--gnn_type', type=str, default='gin', choices=['gin', 'gcn'], help='GNN type: gin or gcn')
+    parser.add_argument('--gnn_type', type=str, default='gin', choices=['gin', 'gcn', 'gat'], help='GNN type: gin or gcn')
     parser.add_argument('--virtual_node', type=bool, default=True, action=argparse.BooleanOptionalAction, help='Use virtual node or not')
     parser.add_argument('--residual', type=bool, default=False, action=argparse.BooleanOptionalAction, help='Using residual connection or not')
     parser.add_argument('--drop_ratio', type=float, default=0.5, help='dropout ratio (default: 0.5)')
