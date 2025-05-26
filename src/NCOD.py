@@ -84,8 +84,7 @@ class ncodLoss(nn.Module):
         h_i = phi_x_i_1.detach().div(phi_x_i_1_norm)
 
         y_bar = torch.mm(h_i, self.h_c_bar_T)
-        print(y_bar.shape)
-        print(y.shape)
+        y_bar = torch.transpose(y_bar, 0, 1)
         y_bar = y_bar * y
         y_bar_max = (y_bar > 0.000).type(torch.float32)
         y_bar = y_bar * y_bar_max
