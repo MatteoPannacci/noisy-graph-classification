@@ -225,7 +225,9 @@ def main(args):
                 C = 6,
                 ratio_consistency = 0,
                 ratio_balance = 0,
-                device = device
+                device = device,
+                encoder_features = args.emb_dim,
+                total_epochs = args.epochs
             )
         else:
             raise ValueError("criterion not found")
