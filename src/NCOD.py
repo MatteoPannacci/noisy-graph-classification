@@ -25,7 +25,7 @@ class ncodLoss(nn.Module):
         self.ratio_balance = ratio_balance
 
 
-        self.u = nn.Parameter(torch.empty(n, 1))
+        self.u = nn.Parameter(torch.empty(n, 1, dtype=torch.float32))
         self.init_param(mean=mean,std=std)
 
         self.beginning = True
@@ -88,7 +88,7 @@ class ncodLoss(nn.Module):
 
         y_bar = torch.mm(h_i, self.h_c_bar_T)
         y_bar = y_bar * y
-        y_bar_max = (y_bar > 0.000)
+        y_bar_max = (y_bar > 0.000).type(torch.float32)
         y_bar = y_bar * y_bar_max
 
         u = u * y
@@ -115,6 +115,8 @@ class ncodLoss(nn.Module):
             consistency_loss = self.consistency_loss( f_x_i_1, f_x_i_2)
 
             L1 += self.ratio_consistency * torch.mean(consistency_loss)
+
+        print(type(L1))
 
         return L1
 
