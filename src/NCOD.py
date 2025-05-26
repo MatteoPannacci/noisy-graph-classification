@@ -49,7 +49,7 @@ class ncodLoss(nn.Module):
         y = y.cpu()
         phi_x_i = phi_x_i.cpu()
 
-        y = F.one_hot(y, num_classes=self.C)
+        y = F.one_hot(y, num_classes=self.C).float()
 
         if len(f_x_i) > len(index):
             f_x_i_1, f_x_i_2 = torch.chunk(f_x_i, 2)
@@ -59,9 +59,6 @@ class ncodLoss(nn.Module):
             phi_x_i_1 = phi_x_i
 
         eps = 1e-4
-
-        print(f_x_i_1.shape)
-        print(phi_x_i_1.shape)
 
         u = self.u[index]
 
@@ -96,7 +93,7 @@ class ncodLoss(nn.Module):
         f_x_softmax = torch.clamp((f_x_softmax + u.detach()), min=eps, max=1.0)
         L1 = torch.mean(-torch.sum((y_bar) * torch.log(f_x_softmax), dim=1))
 
-        y_hat = self.soft_to_hard(f_x_i_1.detach())
+        y_hat = self.soft_to_hard(f_x_i_1.detach()).float()
 
         L2 = F.mse_loss((y_hat + u), y, reduction='sum') / len(y)
         L1 += L2
@@ -115,8 +112,6 @@ class ncodLoss(nn.Module):
             consistency_loss = self.consistency_loss( f_x_i_1, f_x_i_2)
 
             L1 += self.ratio_consistency * torch.mean(consistency_loss)
-
-        print(type(L1))
 
         return L1
 
