@@ -98,7 +98,7 @@ class ncodLoss(nn.Module):
 
         y_hat = self.soft_to_hard(f_x_i_1.detach())
 
-        L2 = F.MSE_loss((y_hat + u), y, reduction='sum') / len(y)
+        L2 = F.mse_loss((y_hat + u), y, reduction='sum') / len(y)
         L1 += L2
 
 
