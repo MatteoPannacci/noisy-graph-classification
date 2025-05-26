@@ -10,7 +10,7 @@ mean = 1e-8
 std = 1e-9
 
 class ncodLoss(nn.Module):
-    def __init__(self, labels, n=50000, C=100, ratio_consistency=0, ratio_balance=0, device=None, encoder_features, total_epochs):
+    def __init__(self, labels, n=50000, C=100, ratio_consistency=0, ratio_balance=0, device=None, encoder_features=300, total_epochs=100):
         super(ncodLoss, self).__init__()
 
         self.C = C
