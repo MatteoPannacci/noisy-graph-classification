@@ -61,8 +61,7 @@ class ncodLoss(nn.Module):
             if self.beginning:
                 percent = math.ceil((50 - (50 / self.total_epochs) * epoch) + 50)
                 for i in range(0, len(self.bins)):
-                    class_u = self.u[10]
-                    class_u = self.u[4479]
+                    class_u = self.u[self.bins[i], :]
                     class_u = class_u.detach()
                     bottomK = int((len(class_u) / 100) * percent)
                     important_indexs = torch.topk(class_u, bottomK, largest=False, dim=0)[1]
