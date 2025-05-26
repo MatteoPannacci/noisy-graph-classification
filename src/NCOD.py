@@ -90,8 +90,11 @@ class ncodLoss(nn.Module):
         y_bar_max = (y_bar > 0.000).type(torch.float32)
         y_bar = y_bar * y_bar_max
 
+        print(u.shape)
         u = u * y
 
+        print(f_x_softmax.shape)
+        print(u.shape)
         f_x_softmax = torch.clamp((f_x_softmax + u.detach()), min=eps, max=1.0)
         L1 = torch.mean(-torch.sum((y_bar) * torch.log(f_x_softmax), dim=1))
 
