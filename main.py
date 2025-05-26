@@ -36,7 +36,7 @@ def train(data_loader, model, optimizer, criterion, device, save_checkpoints, ch
 
         print(data.id)
 
-        if type(loss) == ncodLoss:
+        if type(criterion) == ncodLoss:
             loss = criterion(data.id, output, data.y, phi, batch_counter, current_epoch)
         else:
             loss = criterion(output, data.y)
