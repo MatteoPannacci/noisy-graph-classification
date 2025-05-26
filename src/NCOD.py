@@ -7,17 +7,18 @@ import math
 cross_entropy_val = nn.CrossEntropyLoss
 
 mean = 1e-8
-std  = 1e-9
-encoder_features =512
-total_epochs = 150
+std = 1e-9
 
 class ncodLoss(nn.Module):
-    def __init__(self, labels, n=50000, C=100, ratio_consistency=0, ratio_balance=0, device=None):
+    def __init__(self, labels, n=50000, C=100, ratio_consistency=0, ratio_balance=0, device=None, encoder_features, total_epochs):
         super(ncodLoss, self).__init__()
 
         self.C = C
         self.USE_CUDA = torch.cuda.is_available()
         self.n = n
+
+        self.encoder_features = encoder_features
+        self.total_epochs = total_epochs
 
         self.ratio_consistency = ratio_consistency
         self.ratio_balance = ratio_balance
@@ -27,8 +28,8 @@ class ncodLoss(nn.Module):
         self.init_param(mean=mean,std=std)
 
         self.beginning = True
-        self.prev_phi_x_i = torch.rand((n, encoder_features), device=device)
-        self.phi_c = torch.rand((C, encoder_features), device=device)
+        self.prev_phi_x_i = torch.rand((n, self.encoder_features), device=device)
+        self.phi_c = torch.rand((C, self.encoder_features), device=device)
         self.labels = labels
         self.bins = []
 
@@ -55,7 +56,7 @@ class ncodLoss(nn.Module):
 
         if (flag == 0):
             if self.beginning:
-                percent = math.ceil((50 - (50 / total_epochs) * epoch) + 50)
+                percent = math.ceil((50 - (50 / self.total_epochs) * epoch) + 50)
                 for i in range(0, len(self.bins)):
                     class_u = self.u.detach()[self.bins[i]]
                     bottomK = int((len(class_u) / 100) * percent)
