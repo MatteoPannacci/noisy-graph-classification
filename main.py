@@ -75,8 +75,8 @@ def evaluate(data_loader, model, device, calculate_accuracy=False):
     accuracy_metric = Accuracy(task="multiclass", num_classes=6).to(device)
 
     pred_labels = torch.empty(len(data_loader.dataset), device=device, dtype=torch.int64)
-    true_labels = torch.empty(len(data_loader.dataset), device=device)
-    true_labels2 = torch.empty(len(data_loader.dataset), device=device, dtype=torch.int64)
+    true_labels = torch.empty(len(data_loader.dataset), device=device, dtype=torch.int64)
+
     start_idx = 0
 
     with torch.no_grad():
@@ -94,11 +94,11 @@ def evaluate(data_loader, model, device, calculate_accuracy=False):
             if calculate_accuracy:
                 total_loss += criterion(output, data.y).item()
                 true_labels[start_idx:end_idx] = data.y
-                print(true_labels[start_idx:end_idx])
-                true_labels2[start_idx:end_idx] = data.y
-                print(true_labels2[start_idx:end_idx])
-            
+
             start_idx = end_idx
+
+    print(true_labels)
+    print(true_labels.cpu().numpy())
 
     if calculate_accuracy:
         f1_score = f1_metric(pred_labels, true_labels).item()
