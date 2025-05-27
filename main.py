@@ -148,7 +148,8 @@ def main(args):
         drop_ratio = args.drop_ratio,
         virtual_node = args.virtual_node,
         graph_pooling = args.graph_pooling_type,
-        JK = args.jk
+        JK = args.jk,
+        aggr_type = args.aggr_type
     ).to(device)
 
     # Identify dataset folder (A, B, C, or D)
@@ -392,6 +393,7 @@ if __name__ == "__main__":
     parser.add_argument('--q', type=float, default=0.5)
     parser.add_argument('--alpha', type=float, default=1.0)
     parser.add_argument('--beta', type=float, default=1.0)
+    parser.add_argument('--aggr_type', type=str, default='add', choices=['add', 'mean'])
 
     args = parser.parse_args()
 

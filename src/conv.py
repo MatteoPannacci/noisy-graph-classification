@@ -11,12 +11,12 @@ import math
 
 ### GIN convolution along the graph structure
 class GINConv(MessagePassing):
-    def __init__(self, emb_dim):
+    def __init__(self, emb_dim, aggr_type="add"):
         '''
             emb_dim (int): node embedding dimensionality
         '''
 
-        super(GINConv, self).__init__(aggr = "add")
+        super(GINConv, self).__init__(aggr = aggr_type)
 
         self.mlp = torch.nn.Sequential(torch.nn.Linear(emb_dim, 2*emb_dim), torch.nn.BatchNorm1d(2*emb_dim), torch.nn.ReLU(), torch.nn.Linear(2*emb_dim, emb_dim))
         self.eps = torch.nn.Parameter(torch.Tensor([0]))
@@ -39,8 +39,8 @@ class GINConv(MessagePassing):
 
 ### GCN convolution along the graph structure
 class GCNConv(MessagePassing):
-    def __init__(self, emb_dim):
-        super(GCNConv, self).__init__(aggr='add')
+    def __init__(self, emb_dim, aggr_type="add"):
+        super(GCNConv, self).__init__(aggr = aggr_type)
 
         self.linear = torch.nn.Linear(emb_dim, emb_dim)
         self.root_emb = torch.nn.Embedding(1, emb_dim)
@@ -75,7 +75,7 @@ class GNN_node(torch.nn.Module):
     Output:
         node representations
     """
-    def __init__(self, num_layer, emb_dim, drop_ratio = 0.5, JK = "last", residual = False, gnn_type = 'gin'):
+    def __init__(self, num_layer, emb_dim, drop_ratio = 0.5, JK = "last", residual = False, gnn_type = 'gin', aggr_type="add"):
         '''
             emb_dim (int): node embedding dimensionality
             num_layer (int): number of GNN message passing layers
@@ -100,9 +100,9 @@ class GNN_node(torch.nn.Module):
 
         for layer in range(num_layer):
             if gnn_type == 'gin':
-                self.convs.append(GINConv(emb_dim))
+                self.convs.append(GINConv(emb_dim, aggr_type=aggr_type))
             elif gnn_type == 'gcn':
-                self.convs.append(GCNConv(emb_dim))
+                self.convs.append(GCNConv(emb_dim, aggr_type=aggr_type))
             else:
                 raise ValueError('Undefined GNN type called {}'.format(gnn_type))
 
@@ -180,9 +180,9 @@ class GNN_node_Virtualnode(torch.nn.Module):
 
         for layer in range(num_layer):
             if gnn_type == 'gin':
-                self.convs.append(GINConv(emb_dim))
+                self.convs.append(GINConv(emb_dim, aggr_type=aggr_type))
             elif gnn_type == 'gcn':
-                self.convs.append(GCNConv(emb_dim))
+                self.convs.append(GCNConv(emb_dim, aggr_type=aggr_type))
             else:
                 raise ValueError('Undefined GNN type called {}'.format(gnn_type))
 
