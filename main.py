@@ -319,10 +319,10 @@ def main(args):
 
         # Plot confusion matrix
         train_pred, train_true = evaluate(train_loader, model, device, return_labels=True)
-        plot_confusion_mat("Training", train_pred, train_true, logs_folder)
+        plot_confusion_matrix("Training", train_pred, train_true, logs_folder)
         if use_validation:
             val_pred, val_true = evaluate(val_loader, model, device, return_labels=True)
-            plot_confusion_mat("Validation", val_pred, val_true, logs_folder)
+            plot_confusion_matrix("Validation", val_pred, val_true, logs_folder)
 
         # DELETE TRAIN DATASET VARIABLES
         if use_validation:
