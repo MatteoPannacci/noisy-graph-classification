@@ -74,14 +74,12 @@ def plot_all(train_losses, train_accuracies, train_f1s, val_losses, val_accuraci
 def plot_confusion_matrix(split_name, preds, ground_truth, output_dir):
 
     cm = confusion_matrix(ground_truth, preds)
-    cm_percentage = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis] * 100
-    plt.rcParams["figure.figsize"] = (6,6)
 
     classes = list(range(6))
 
     fig, ax = plt.subplots()
-    im = ax.imshow(cm_percentage, interpolation='nearest', cmap=plt.cm.Blues, vmin=0, vmax=100)
-    ax.figure.colorbar(im, ax=ax, shrink=0.75)
+    im = ax.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+    ax.figure.colorbar(im, ax=ax, shrink = 0.75)
     ax.set(xticks=np.arange(cm.shape[1]),
            yticks=np.arange(cm.shape[0]),
            xticklabels=classes, yticklabels=classes,
@@ -92,11 +90,12 @@ def plot_confusion_matrix(split_name, preds, ground_truth, output_dir):
 
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
 
+    thresh = cm.max() / 2.
     for i in range(cm.shape[0]):
         for j in range(cm.shape[1]):
-            ax.text(j, i, f'{cm_percentage[i, j]:.2f}%',
+            ax.text(j, i, format(cm[i, j], 'd'),
                     ha="center", va="center",
-                    color="white" if cm_percentage[i, j] > 50 else "black")
+                    color="white" if cm[i, j] > thresh else "black")
 
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, f"{split_name}_confusion_mat.png"))
