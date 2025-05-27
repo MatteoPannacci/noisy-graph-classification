@@ -87,13 +87,12 @@ def evaluate(data_loader, model, device, calculate_accuracy=False, return_labels
 
             pred = output.argmax(dim=1)
 
-
             batch_size = data.num_graphs
             end_idx = start_idx + batch_size
             pred_labels[start_idx:end_idx] = pred
             if calculate_accuracy:
                 total_loss += criterion(output, data.y).item()
-                true_labels[start_idx:end_idx] = data.y
+                true_labels[start_idx:end_idx] = data.y.int()
             
             start_idx = end_idx
 
