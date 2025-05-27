@@ -103,7 +103,7 @@ def evaluate(data_loader, model, device, calculate_accuracy=False, return_labels
         return  total_loss / len(data_loader), accuracy, f1_score
 
     if return_labels:
-        return pred_labels.cpu().numpy(), true_label.cpu().numpy()
+        return pred_labels.cpu().numpy(), true_labels.cpu().numpy()
 
     else:
         return pred_labels.cpu().numpy()
