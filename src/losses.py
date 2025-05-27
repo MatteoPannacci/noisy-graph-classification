@@ -45,7 +45,7 @@ class SymmetricCrossEntropyLoss(torch.nn.Module):
             sample_weights = self.weight[targets]
             rce = (rce * sample_weights).mean()
         else:
-            rce = rce_per_sample.mean()
+            rce = rce.mean()
 
         # Loss
         loss = self.alpha * ce + self.beta * rce
