@@ -85,6 +85,10 @@ def evaluate(data_loader, model, device, calculate_accuracy=False):
             data = data.to(device)
             output, _ = model(data)
 
+            print(data.y)
+            print(type(data.y))
+            print(type(data.y[0]))
+
             pred = output.argmax(dim=1)
 
             batch_size = data.num_graphs
