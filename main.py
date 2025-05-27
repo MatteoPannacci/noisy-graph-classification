@@ -64,7 +64,7 @@ def train(data_loader, model, optimizer, criterion, device, save_checkpoints, ch
     return total_loss / len(data_loader), accuracy, f1_score
 
 
-def evaluate(data_loader, model, device, calculate_accuracy=False, return_labels=False):
+def evaluate(data_loader, model, device, calculate_accuracy=False):
 
     model.eval()
     
@@ -74,8 +74,8 @@ def evaluate(data_loader, model, device, calculate_accuracy=False, return_labels
     f1_metric = F1Score(task="multiclass", num_classes=6, average='macro').to(device)
     accuracy_metric = Accuracy(task="multiclass", num_classes=6).to(device)
 
-    pred_labels = torch.empty(len(data_loader.dataset), device=device, dtype=torch.int64)
-    true_labels = torch.empty(len(data_loader.dataset), device=device, dtype=torch.int64)
+    pred_labels = torch.empty(len(data_loader.dataset), device=device)
+    true_labels = torch.empty(len(data_loader.dataset), device=device)
     start_idx = 0
 
     with torch.no_grad():
@@ -92,7 +92,7 @@ def evaluate(data_loader, model, device, calculate_accuracy=False, return_labels
             pred_labels[start_idx:end_idx] = pred
             if calculate_accuracy:
                 total_loss += criterion(output, data.y).item()
-                true_labels[start_idx:end_idx] = data.y.int()
+                true_labels[start_idx:end_idx] = data.y
             
             start_idx = end_idx
 
@@ -100,11 +100,6 @@ def evaluate(data_loader, model, device, calculate_accuracy=False, return_labels
         f1_score = f1_metric(pred_labels, true_labels).item()
         accuracy = accuracy_metric(pred_labels, true_labels).item()
         return  total_loss / len(data_loader), accuracy, f1_score
-    
-    if return_labels:
-        print(f"True Labels: {true_labels}")
-        print(f"True Labels Numpy: {true_labels.cpu().numpy()}")
-        return pred_labels.cpu().numpy(), true_labels.cpu().numpy()
 
     else:
         return pred_labels.cpu().numpy()
@@ -319,16 +314,6 @@ def main(args):
             plot_progress("Validation", val_losses, val_accuracies, val_f1s, os.path.join(logs_folder, "plotsVal"))
             plot_all(train_losses, train_accuracies, train_f1s, val_losses, val_accuracies, val_f1s, os.path.join(logs_folder, "plotsAll"))
 
-        # Plot confusion matrix
-        train_pred, train_true = evaluate(train_loader, model, device, return_labels=True)
-        plot_confusion_matrix("Training", train_pred, train_true, logs_folder)
-        del train_pred
-        del train_true
-        if use_validation:
-            val_pred, val_true = evaluate(val_loader, model, device, return_labels=True)
-            plot_confusion_matrix("Validation", val_pred, val_true, logs_folder)
-            del val_pred
-            del val_true
 
         # DELETE TRAIN DATASET VARIABLES
         if use_validation:
