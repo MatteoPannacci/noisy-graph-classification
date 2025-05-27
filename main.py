@@ -64,7 +64,7 @@ def train(data_loader, model, optimizer, criterion, device, save_checkpoints, ch
     return total_loss / len(data_loader), accuracy, f1_score
 
 
-def evaluate(data_loader, model, device, calculate_accuracy=False):
+def evaluate(data_loader, model, device, calculate_accuracy=False, return_labels=False):
 
     model.eval()
     
@@ -100,6 +100,9 @@ def evaluate(data_loader, model, device, calculate_accuracy=False):
         f1_score = f1_metric(pred_labels, true_labels).item()
         accuracy = accuracy_metric(pred_labels, true_labels).item()
         return  total_loss / len(data_loader), accuracy, f1_score
+    
+    if return_labels:
+        return pred_labels.cpu().numpy(), true_labels.cpu().numpy()
 
     else:
         return pred_labels.cpu().numpy()
@@ -214,7 +217,7 @@ def main(args):
         elif args.loss_type == 2:
             criterion = NoisyCrossEntropyLoss(args.noise_prob, weight=class_weights)
         elif args.loss_type == 3:
-            criterion = SymmetricCrossEntropyLoss(weight=class_weights)
+            criterion = SymmetricCrossEntropyLoss(alpha=args.alpha, beta=args.beta)
         elif args.loss_type == 4:
 
             all_labels = []
@@ -314,6 +317,12 @@ def main(args):
             plot_progress("Validation", val_losses, val_accuracies, val_f1s, os.path.join(logs_folder, "plotsVal"))
             plot_all(train_losses, train_accuracies, train_f1s, val_losses, val_accuracies, val_f1s, os.path.join(logs_folder, "plotsAll"))
 
+        # Plot confusion matrix
+        train_pred, train_true = evaluate(train_loader, model, device, return_labels=True)
+        plot_confusion_mat("Training", train_pred, train_true, logs_folder)
+        if use_validation:
+            val_pred, val_true = evaluate(val_loader, model, device, return_labels=True)
+            plot_confusion_mat("Validation", val_pred, val_true, logs_folder)
 
         # DELETE TRAIN DATASET VARIABLES
         if use_validation:
@@ -322,9 +331,15 @@ def main(args):
             del full_dataset
             del val_dataset
             del val_loader
+            del train_pred
+            del train_true
+            del val_pred
+            del val_true
         else:
             del train_dataset
             del train_loader
+            del train_pred
+            del train_true
         gc.collect()
 
     # Prepare test dataset and loader
@@ -364,6 +379,8 @@ if __name__ == "__main__":
     parser.add_argument('--use_class_weights', type=bool, default=False, action=argparse.BooleanOptionalAction, help='use class weights in the loss computation')
     parser.add_argument('--jk', type=str, default="last", choices=['last', 'sum'])
     parser.add_argument('--q', type=float, default=0.5)
+    parser.add_argument('--alpha', type=float, default=1.0)
+    parser.add_argument('--beta', type=float, default=1.0)
 
     args = parser.parse_args()
 

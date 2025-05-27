@@ -1,5 +1,6 @@
 import os
 import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
 
 
 def plot_progress(split_name, losses, accuracies, f1_scores, output_dir):
@@ -66,4 +67,37 @@ def plot_all(train_losses, train_accuracies, train_f1s, val_losses, val_accuraci
     os.makedirs(output_dir, exist_ok=True)
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, f"full_plot.png"))
+    plt.close()
+
+
+def plot_confusion_matrix(split_name, preds, ground_truth, output_dir):
+
+    cm = confusion_matrix(ground_truth, preds)
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+    im = ax.imshow(cm, interpolation='nearest', cmap='Blues')
+    ax.figure.colorbar(im, ax=ax)
+
+    ax.set(xticks=np.arange(len(class_names)),
+           yticks=np.arange(len(class_names)),
+           xticklabels=class_names, yticklabels=class_names,
+           ylabel='True label',
+           xlabel='Predicted label',
+           title='Confusion Matrix')
+
+    thresh = cm.max() / 2.
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            ax.text(j, i, format(cm[i, j], fmt),
+                    ha="center", va="center",
+                    color="white" if cm[i, j] > thresh else "black")
+
+    plt.figure(figsize=(8,6))
+    sns.heatmap(cm, annot=True, fmt='.2f' if normalize else 'd', cmap='Blues')
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+    plt.title('Confusion Matrix')
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, f"{split_name}_confusion_mat.png"))
     plt.close()
