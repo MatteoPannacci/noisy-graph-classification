@@ -73,7 +73,7 @@ def plot_all(train_losses, train_accuracies, train_f1s, val_losses, val_accuraci
 
 def plot_confusion_matrix(split_name, preds, ground_truth, output_dir):
 
-    cm = confusion_matrix(y_true, y_pred)
+    cm = confusion_matrix(ground_truth, preds)
     cm_percentage = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis] * 100
     plt.rcParams["figure.figsize"] = (6,6)
 
