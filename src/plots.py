@@ -79,10 +79,7 @@ def plot_confusion_matrix(split_name, preds, ground_truth, output_dir):
     im = ax.imshow(cm, interpolation='nearest', cmap='Blues')
     ax.figure.colorbar(im, ax=ax)
 
-    ax.set(xticks=np.arange(len(class_names)),
-           yticks=np.arange(len(class_names)),
-           xticklabels=class_names, yticklabels=class_names,
-           ylabel='True label',
+    ax.set(ylabel='True label',
            xlabel='Predicted label',
            title='Confusion Matrix')
 
