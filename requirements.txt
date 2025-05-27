@@ -6,5 +6,5 @@ matplotlib
 pandas
 tqdm
 argparse
-sklearn
+scikit-learn
 
