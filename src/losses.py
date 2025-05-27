@@ -18,10 +18,10 @@ class NoisyCrossEntropyLoss(torch.nn.Module):
 
 
 
-class SCELoss(torch.nn.Module):
+class SymmetricCrossEntropyLoss(torch.nn.Module):
 
     def __init__(self, alpha, beta, num_classes=6):
-        super(SCELoss, self).__init__()
+        super(SymmetricCrossEntropyLoss, self).__init__()
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.alpha = alpha
         self.beta = beta
