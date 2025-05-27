@@ -74,8 +74,8 @@ def evaluate(data_loader, model, device, calculate_accuracy=False, return_labels
     f1_metric = F1Score(task="multiclass", num_classes=6, average='macro').to(device)
     accuracy_metric = Accuracy(task="multiclass", num_classes=6).to(device)
 
-    pred_labels = torch.empty(len(data_loader.dataset), device=device)
-    true_labels = torch.empty(len(data_loader.dataset), device=device)
+    pred_labels = torch.empty(len(data_loader.dataset), device=device, dtype=torch.int64)
+    true_labels = torch.empty(len(data_loader.dataset), device=device, dtype=torch.int64)
     start_idx = 0
 
     with torch.no_grad():
@@ -86,6 +86,7 @@ def evaluate(data_loader, model, device, calculate_accuracy=False, return_labels
             output, _ = model(data)
 
             pred = output.argmax(dim=1)
+
 
             batch_size = data.num_graphs
             end_idx = start_idx + batch_size
@@ -102,10 +103,10 @@ def evaluate(data_loader, model, device, calculate_accuracy=False, return_labels
         return  total_loss / len(data_loader), accuracy, f1_score
     
     if return_labels:
-        return pred_labels.cpu(), true_labels.cpu()
+        return pred_labels.cpu().numpy(), true_labels.cpu().numpy()
 
     else:
-        return pred_labels.cpu()
+        return pred_labels.cpu().numpy()
 
 
 def save_predictions(predictions, test_path):
