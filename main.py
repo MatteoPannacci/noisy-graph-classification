@@ -74,7 +74,7 @@ def evaluate(data_loader, model, device, calculate_accuracy=False):
     f1_metric = F1Score(task="multiclass", num_classes=6, average='macro').to(device)
     accuracy_metric = Accuracy(task="multiclass", num_classes=6).to(device)
 
-    pred_labels = torch.empty(len(data_loader.dataset), device=device)
+    pred_labels = torch.empty(len(data_loader.dataset), device=device, dtype=torch.int64)
     true_labels = torch.empty(len(data_loader.dataset), device=device)
     start_idx = 0
 
