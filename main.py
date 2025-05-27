@@ -321,9 +321,13 @@ def main(args):
         # Plot confusion matrix
         train_pred, train_true = evaluate(train_loader, model, device, return_labels=True)
         plot_confusion_matrix("Training", train_pred, train_true, logs_folder)
+        del train_pred
+        del train_true
         if use_validation:
             val_pred, val_true = evaluate(val_loader, model, device, return_labels=True)
             plot_confusion_matrix("Validation", val_pred, val_true, logs_folder)
+            del val_pred
+            del val_true
 
         # DELETE TRAIN DATASET VARIABLES
         if use_validation:
@@ -332,15 +336,9 @@ def main(args):
             del full_dataset
             del val_dataset
             del val_loader
-            del train_pred
-            del train_true
-            del val_pred
-            del val_true
         else:
             del train_dataset
             del train_loader
-            del train_pred
-            del train_true
         gc.collect()
 
     # Prepare test dataset and loader
