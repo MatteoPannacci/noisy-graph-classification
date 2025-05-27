@@ -64,7 +64,7 @@ def train(data_loader, model, optimizer, criterion, device, save_checkpoints, ch
     return total_loss / len(data_loader), accuracy, f1_score
 
 
-def evaluate(data_loader, model, device, calculate_accuracy=False):
+def evaluate(data_loader, model, device, calculate_accuracy=False, return_preds=False):
 
     model.eval()
     
@@ -91,19 +91,19 @@ def evaluate(data_loader, model, device, calculate_accuracy=False):
             batch_size = data.num_graphs
             end_idx = start_idx + batch_size
             pred_labels[start_idx:end_idx] = pred
-            if calculate_accuracy:
+            if calculate_accuracy or return_preds:
                 total_loss += criterion(output, data.y).item()
                 true_labels[start_idx:end_idx] = data.y
 
             start_idx = end_idx
 
-    print(true_labels)
-    print(true_labels.cpu().numpy())
-
     if calculate_accuracy:
         f1_score = f1_metric(pred_labels, true_labels).item()
         accuracy = accuracy_metric(pred_labels, true_labels).item()
         return  total_loss / len(data_loader), accuracy, f1_score
+
+    if return_preds:
+        return pred_labels.cpu().numpy(), true_label.cpu().numpy()
 
     else:
         return pred_labels.cpu().numpy()
@@ -318,6 +318,7 @@ def main(args):
             plot_progress("Validation", val_losses, val_accuracies, val_f1s, os.path.join(logs_folder, "plotsVal"))
             plot_all(train_losses, train_accuracies, train_f1s, val_losses, val_accuracies, val_f1s, os.path.join(logs_folder, "plotsAll"))
 
+        train_true = evaluate(val_loader, model, device, calculate_accuracy=True)
 
         # DELETE TRAIN DATASET VARIABLES
         if use_validation:

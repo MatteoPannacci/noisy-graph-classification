@@ -2,6 +2,7 @@ import os
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 import numpy as np
+import seaborn as sns
 
 
 def plot_progress(split_name, losses, accuracies, f1_scores, output_dir):
@@ -68,4 +69,19 @@ def plot_all(train_losses, train_accuracies, train_f1s, val_losses, val_accuraci
     os.makedirs(output_dir, exist_ok=True)
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, f"full_plot.png"))
+    plt.close()
+
+
+def plot_confusion_matrix(split_name, preds, ground_truth, output_dir):
+
+    cm = confusion_matrix(ground_truth, preds)
+
+    plt.figure(figsize=(6, 5))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+    plt.title('Confusion Matrix')
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, f"{split_name}_confusion_mat.png"))
     plt.close()

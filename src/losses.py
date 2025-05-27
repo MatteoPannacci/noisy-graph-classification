@@ -10,7 +10,6 @@ class NoisyCrossEntropyLoss(torch.nn.Module):
         self.p = p_noisy
         self.ce = torch.nn.CrossEntropyLoss(reduction='none', weight=weight)
 
-
     def forward(self, logits, targets):
         losses = self.ce(logits, targets)
         weights = (1 - self.p) + self.p * (1 - F.one_hot(targets, num_classes=logits.size(1)).float().sum(dim=1))
