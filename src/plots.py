@@ -2,6 +2,7 @@ import os
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 import numpy as np
+import seaborn as sns
 
 
 def plot_progress(split_name, losses, accuracies, f1_scores, output_dir):
@@ -75,28 +76,15 @@ def plot_confusion_matrix(split_name, preds, ground_truth, output_dir):
 
     cm = confusion_matrix(ground_truth, preds)
 
-    classes = [str(i) for i in range(6)]
-
-    fig, ax = plt.subplots()
-    im = ax.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
-    ax.figure.colorbar(im, ax=ax, shrink = 0.75)
-    ax.set(xticks=np.arange(6),
-           yticks=np.arange(6),
-           xticklabels=classes, yticklabels=classes,
-           ylabel='True class',
-           xlabel='Predicted class')
-
-    ax.set_ylim(len(classes) - 0.5, -0.5)
-
-    plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
-
-    thresh = cm.max() / 2.
-    for i in range(6):
-        for j in range(6):
-            ax.text(j, i, format(cm[i, j], 'd'),
-                    ha="center", va="center",
-                    color="white" if cm[i, j] > thresh else "black")
+    plt.figure(figsize=(6, 5))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+    plt.title('Confusion Matrix')
 
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, f"{split_name}_confusion_mat.png"))
     plt.close()
+
+
+
