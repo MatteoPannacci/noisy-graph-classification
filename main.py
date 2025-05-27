@@ -76,6 +76,7 @@ def evaluate(data_loader, model, device, calculate_accuracy=False):
 
     pred_labels = torch.empty(len(data_loader.dataset), device=device, dtype=torch.int64)
     true_labels = torch.empty(len(data_loader.dataset), device=device)
+    true_labels2 = torch.empty(len(data_loader.dataset), device=device, dtype=torch.int64)
     start_idx = 0
 
     with torch.no_grad():
@@ -85,10 +86,6 @@ def evaluate(data_loader, model, device, calculate_accuracy=False):
             data = data.to(device)
             output, _ = model(data)
 
-            print(data.y)
-            print(type(data.y))
-            print(type(data.y[0]))
-
             pred = output.argmax(dim=1)
 
             batch_size = data.num_graphs
@@ -97,6 +94,9 @@ def evaluate(data_loader, model, device, calculate_accuracy=False):
             if calculate_accuracy:
                 total_loss += criterion(output, data.y).item()
                 true_labels[start_idx:end_idx] = data.y
+                print(true_labels[start_idx:end_idx])
+                true_labels2[start_idx:end_idx] = data.y
+                print(true_labels2[start_idx:end_idx])
             
             start_idx = end_idx
 
