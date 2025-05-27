@@ -20,13 +20,14 @@ class NoisyCrossEntropyLoss(torch.nn.Module):
 
 class SymmetricCrossEntropyLoss(torch.nn.Module):
 
-    def __init__(self, alpha, beta, num_classes=6):
+    def __init__(self, alpha, beta, num_classes=6, weight=None):
         super(SymmetricCrossEntropyLoss, self).__init__()
+        self.weight = weight
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.alpha = alpha
         self.beta = beta
         self.num_classes = num_classes
-        self.cross_entropy = torch.nn.CrossEntropyLoss()
+        self.cross_entropy = torch.nn.CrossEntropyLoss(weight=weight)
 
     def forward(self, pred, labels):
 
@@ -40,8 +41,14 @@ class SymmetricCrossEntropyLoss(torch.nn.Module):
         label_one_hot = torch.clamp(label_one_hot, min=1e-4, max=1.0)
         rce = (-1*torch.sum(pred * torch.log(label_one_hot), dim=1))
 
+        if self.weight is not None:
+            sample_weights = self.weight[targets]
+            rce = (rce * sample_weights).mean()
+        else:
+            rce = rce_per_sample.mean()
+
         # Loss
-        loss = self.alpha * ce + self.beta * rce.mean()
+        loss = self.alpha * ce + self.beta * rce
         return loss
 
 
