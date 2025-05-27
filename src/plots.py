@@ -1,6 +1,7 @@
 import os
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
+import numpy as np
 
 
 def plot_progress(split_name, losses, accuracies, f1_scores, output_dir):
