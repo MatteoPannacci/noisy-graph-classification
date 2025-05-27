@@ -318,7 +318,28 @@ def main(args):
             plot_progress("Validation", val_losses, val_accuracies, val_f1s, os.path.join(logs_folder, "plotsVal"))
             plot_all(train_losses, train_accuracies, train_f1s, val_losses, val_accuracies, val_f1s, os.path.join(logs_folder, "plotsAll"))
 
-        train_true = evaluate(val_loader, model, device, calculate_accuracy=True)
+        # Plot confusion matrix
+        train_pred, train_true = evaluate(train_loader, model, device, return_labels=True)
+        plot_confusion_matrix("Training", train_pred, train_true, logs_folder)
+        del train_pred
+        del train_true
+        if use_validation:
+            val_pred, val_true = evaluate(val_loader, model, device, return_labels=True)
+            plot_confusion_matrix("Validation", val_pred, val_true, logs_folder)
+            del val_pred
+            del val_true
+
+        # DELETE TRAIN DATASET VARIABLES
+        if use_validation:
+            del train_dataset
+            del train_loader
+            del full_dataset
+            del val_dataset
+            del val_loader
+        else:
+            del train_dataset
+            del train_loader
+        gc.collect()
 
         # DELETE TRAIN DATASET VARIABLES
         if use_validation:
