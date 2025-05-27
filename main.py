@@ -64,7 +64,7 @@ def train(data_loader, model, optimizer, criterion, device, save_checkpoints, ch
     return total_loss / len(data_loader), accuracy, f1_score
 
 
-def evaluate(data_loader, model, device, calculate_accuracy=False, return_preds=False):
+def evaluate(data_loader, model, device, calculate_accuracy=False, return_labels=False):
 
     model.eval()
     
@@ -91,7 +91,7 @@ def evaluate(data_loader, model, device, calculate_accuracy=False, return_preds=
             batch_size = data.num_graphs
             end_idx = start_idx + batch_size
             pred_labels[start_idx:end_idx] = pred
-            if calculate_accuracy or return_preds:
+            if calculate_accuracy or return_labels:
                 total_loss += criterion(output, data.y).item()
                 true_labels[start_idx:end_idx] = data.y
 
@@ -102,7 +102,7 @@ def evaluate(data_loader, model, device, calculate_accuracy=False, return_preds=
         accuracy = accuracy_metric(pred_labels, true_labels).item()
         return  total_loss / len(data_loader), accuracy, f1_score
 
-    if return_preds:
+    if return_labels:
         return pred_labels.cpu().numpy(), true_label.cpu().numpy()
 
     else:
