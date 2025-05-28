@@ -319,6 +319,9 @@ def main(args):
             plot_progress("Validation", val_losses, val_accuracies, val_f1s, os.path.join(logs_folder, "plotsVal"))
             plot_all(train_losses, train_accuracies, train_f1s, val_losses, val_accuracies, val_f1s, os.path.join(logs_folder, "plotsAll"))
 
+        # Load best model
+        model.load_state_dict(torch.load(checkpoint_path))
+
         # Plot confusion matrix
         train_pred, train_true = evaluate(train_loader, model, device, return_labels=True)
         plot_confusion_matrix("Training", train_pred, train_true, logs_folder)
@@ -349,7 +352,6 @@ def main(args):
 
     # Generate predictions for the test set using the best model
     print("generating prediction")
-    model.load_state_dict(torch.load(checkpoint_path))
     predictions = evaluate(test_loader, model, device, calculate_accuracy=False)
     save_predictions(predictions, args.test_path)
 
