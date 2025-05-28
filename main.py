@@ -61,6 +61,9 @@ def train(data_loader, model, optimizer, criterion, device, save_checkpoints, ch
     f1_score = f1_metric(pred_labels, true_labels).item()
     accuracy = accuracy_metric(pred_labels, true_labels).item()
 
+    print((pred_labels == true_labels).sum() / pred_labels.shape[0])
+    print(accuracy)
+
     return total_loss / len(data_loader), accuracy, f1_score
 
 
