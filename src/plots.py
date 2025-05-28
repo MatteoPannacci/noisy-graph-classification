@@ -76,8 +76,6 @@ def plot_confusion_matrix(split_name, preds, ground_truth, output_dir):
 
     cm = confusion_matrix(ground_truth, preds)
 
-    print((preds == ground_truth).sum())
-
     plt.figure(figsize=(6, 5))
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
     plt.xlabel('Predicted')
