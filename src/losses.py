@@ -4,17 +4,20 @@ import torch.nn.functional as F
 
 
 class NoisyCrossEntropyLoss(torch.nn.Module):
-
     def __init__(self, p_noisy, weight=None):
         super().__init__()
-        self.p = p_noisy
+        self.p_noisy = p_noisy
         self.ce = torch.nn.CrossEntropyLoss(reduction='none', weight=weight)
 
     def forward(self, logits, targets):
         losses = self.ce(logits, targets)
-        weights = (1 - self.p) + self.p * (1 - F.one_hot(targets, num_classes=logits.size(1)).float().sum(dim=1))
-        return (losses * weights).mean()
 
+        probs = F.softmax(logits, dim=1)
+        true_class_probs = probs[torch.arange(len(targets)), targets]
+        uncertainty = 1.0 - true_class_probs.detach()
+        weights = (1.0 - self.p_noisy) + self.p_noisy * uncertainty
+        weighted_loss = (losses * weights).mean()
+        return weighted_loss
 
 
 class SymmetricCrossEntropyLoss(torch.nn.Module):
