@@ -242,6 +242,8 @@ def main(args):
 
         elif args.loss_type == 5:
             criterion = GeneralizedCrossEntropyLoss(q=args.q, weight=class_weights)
+        elif args.loss_type == 6:
+            criterion = NoisyCrossEntropyLossCustom(args.noise_prob, weight=class_weights)
 
         else:
             raise ValueError("criterion not found")
@@ -307,10 +309,12 @@ def main(args):
             if (use_validation and val_acc > best_accuracy): # use f1 score instead?
                 best_accuracy = val_acc
                 torch.save(model.state_dict(), checkpoint_path)
+                torch.save(model.state_dict(), os.path.join(checkpoints_folder, f"model_{test_dir_name}_best_at_{epoch}"))
                 logger.info(f"Best model updated and saved at {checkpoint_path}")
             elif (not use_validation and train_acc > best_accuracy):
                 best_accuracy = train_acc
                 torch.save(model.state_dict(), checkpoint_path)
+                torch.save(model.state_dict(), os.path.join(checkpoints_folder, f"model_{test_dir_name}_best_at_{epoch}"))
                 logger.info(f"Best model updated and saved at {checkpoint_path}")
             
             logger.info("---")
@@ -369,7 +373,7 @@ if __name__ == "__main__":
     parser.add_argument("--num_checkpoints", type=int, help="Number of checkpoints to save during training.")
     parser.add_argument('--device', type=int, default=1, help='which gpu to use if any (default: 0)')
     parser.add_argument('--seed', type=int, default=42, help='random seed')
-
+    parser.add_argument('--save_all_best', type=bool, default=False, action=argparse.BooleanOptionalAction)
 
     # Architecture
     parser.add_argument('--gnn_type', type=str, default='gin', choices=['gin', 'gcn', 'gat'], help='GNN type: gin or gcn')
@@ -388,7 +392,7 @@ if __name__ == "__main__":
     parser.add_argument('--epochs', type=int, default=10, help='number of epochs to train (default: 10)')
 
     # Loss
-    parser.add_argument('--loss_type', type=int, default=1, help='[1]: CrossEntropy; [2]: NoisyCrossEntropy; [3] SymmetricCrossEntropy; [4] NCOD; [5] GeneralizedCrossEntropy')
+    parser.add_argument('--loss_type', type=int, default=1, help='[1]: CrossEntropy; [2]: NoisyCrossEntropy; [3] SymmetricCrossEntropy; [4] NCOD; [5] GeneralizedCrossEntropy; [6] NoisyCrossEntropyCustom')
     parser.add_argument('--noise_prob', type=float, default=0.2)
     parser.add_argument('--weight_decay', type=float, default=0.0)
     parser.add_argument('--use_class_weights', type=bool, default=False, action=argparse.BooleanOptionalAction, help='use class weights in the loss computation')
