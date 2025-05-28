@@ -14,6 +14,25 @@ from torchmetrics.classification import F1Score
 from src.models import GNN 
 
 
+def save_predictions(predictions, test_path):
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    submission_folder = os.path.join(script_dir, "submission")
+    test_dir_name = os.path.basename(os.path.dirname(test_path))
+
+    os.makedirs(submission_folder, exist_ok=True)
+    output_csv_path = os.path.join(submission_folder, f"testset_{test_dir_name}.csv")
+
+    test_graph_ids = list(range(len(predictions)))
+    output_df = pd.DataFrame({
+        "id": test_graph_ids,
+        "pred": predictions
+    })
+
+    output_df.to_csv(output_csv_path, index=False)
+    print(f"Predictions saved to {output_csv_path}")
+
+
+
 def train(data_loader, model, optimizer, criterion, device, save_checkpoints, checkpoint_path, current_epoch):
 
     model.train()
