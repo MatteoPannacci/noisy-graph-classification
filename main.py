@@ -190,6 +190,11 @@ def main(args):
     # If train_path is provided, train the model
     if args.train_path:
 
+        if args.from_pretrain:
+            print("loading pretrained model")
+            pretrain_path = os.path.join(script_dir, "checkpoints", f"model_pretrain_best.pth")
+            model.load_state_dict(torch.load(pretrain_path))
+
         print("loading train datasets")
         use_validation = (args.val_proportion != 0.0)
 
@@ -323,12 +328,12 @@ def main(args):
             if (use_validation and val_acc > best_accuracy): # use f1 score instead?
                 best_accuracy = val_acc
                 torch.save(model.state_dict(), checkpoint_path)
-                torch.save(model.state_dict(), os.path.join(checkpoints_folder, f"model_{test_dir_name}_best_at_{epoch}"))
+                torch.save(model.state_dict(), os.path.join(checkpoints_folder, f"model_{test_dir_name}_best_at_{epoch}.pth"))
                 logger.info(f"Best model updated and saved at {checkpoint_path}")
             elif (not use_validation and train_acc > best_accuracy):
                 best_accuracy = train_acc
                 torch.save(model.state_dict(), checkpoint_path)
-                torch.save(model.state_dict(), os.path.join(checkpoints_folder, f"model_{test_dir_name}_best_at_{epoch}"))
+                torch.save(model.state_dict(), os.path.join(checkpoints_folder, f"model_{test_dir_name}_best_at_{epoch}.pth"))
                 logger.info(f"Best model updated and saved at {checkpoint_path}")
             
             logger.info("---")
@@ -388,6 +393,7 @@ if __name__ == "__main__":
     parser.add_argument('--device', type=int, default=1, help='which gpu to use if any (default: 0)')
     parser.add_argument('--seed', type=int, default=42, help='random seed')
     parser.add_argument('--save_all_best', type=bool, default=False, action=argparse.BooleanOptionalAction)
+    parser.add_argument('--from_pretrain', type=bool, default=False, action=argparse.BooleanOptionalAction)
 
     # Architecture
     parser.add_argument('--gnn_type', type=str, default='gin', choices=['gin', 'gcn', 'gat'], help='GNN type: gin or gcn')
