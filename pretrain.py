@@ -172,7 +172,7 @@ def main(args):
         # Identify dataset folder (A, B, C, or D)
         dataset_dir_name = os.path.basename(os.path.dirname(dataset_path))
 
-        print("loading train datasets")
+        print(f"loading train dataset {dataset_dir_name}")
         use_validation = (args.val_proportion != 0.0)
 
         if use_validation:
@@ -265,11 +265,6 @@ def main(args):
         else:
             checkpoint_intervals = [num_epochs]
 
-        if args.train_from_best:
-            use_validation = False
-            train_loader = val_loader
-            model.load_state_dict(torch.load(checkpoint_path))
-
         print("starting training")
         for epoch in range(num_epochs):
 
@@ -315,25 +310,8 @@ def main(args):
             
             logger.info("---")
 
-        # Plot training progress in current directory
-        plot_progress("Training", train_losses, train_accuracies, train_f1s, os.path.join(logs_folder, "plotsTrain"))
-        if use_validation:
-            plot_progress("Validation", val_losses, val_accuracies, val_f1s, os.path.join(logs_folder, "plotsVal"))
-            plot_all(train_losses, train_accuracies, train_f1s, val_losses, val_accuracies, val_f1s, os.path.join(logs_folder, "plotsAll"))
-
         # Load best model
         model.load_state_dict(torch.load(checkpoint_path))
-
-        # Plot confusion matrix
-        train_pred, train_true = evaluate(train_loader, model, device, return_labels=True)
-        plot_confusion_matrix("Training", train_pred, train_true, logs_folder)
-        del train_pred
-        del train_true
-        if use_validation:
-            val_pred, val_true = evaluate(val_loader, model, device, return_labels=True)
-            plot_confusion_matrix("Validation", val_pred, val_true, logs_folder)
-            del val_pred
-            del val_true
 
         # DELETE TRAIN DATASET VARIABLES
         if use_validation:
@@ -374,7 +352,6 @@ if __name__ == "__main__":
     parser.add_argument('--lr', type=float, default=0.001, help='optimizer learning rate')
     parser.add_argument('--batch_size', type=int, default=32, help='input batch size for training (default: 32)')
     parser.add_argument('--epochs', type=int, default=10, help='number of epochs to train (default: 10)')
-    parser.add_argument('--train_from_best', type=bool, default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument('--optimizer_type', type=str, default='adam', choices=['adam','adamw'])
 
     # Loss
