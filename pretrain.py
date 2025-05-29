@@ -161,10 +161,10 @@ def main(args):
 
     # dataset paths
     dataset_paths = [
-        os.path.join(script_dir, "/datasets/A/train.json.gz"),
-        os.path.join(script_dir, "/datasets/B/train.json.gz"),
-        os.path.join(script_dir, "/datasets/C/train.json.gz"),
-        os.path.join(script_dir, "/datasets/D/train.json.gz")
+        os.path.join(script_dir, "datasets/A/train.json.gz"),
+        os.path.join(script_dir, "datasets/B/train.json.gz"),
+        os.path.join(script_dir, "datasets/C/train.json.gz"),
+        os.path.join(script_dir, "datasets/D/train.json.gz")
     ]
 
     for dataset_path in dataset_paths: 
