@@ -218,7 +218,7 @@ def main(args):
         if args.optimizer_type == 'adam':
             optimizer_type = torch.optim.Adam
         elif args.optimizer_type == 'adamw':
-            optimizer_type == torch.optim.AdamW
+            optimizer_type = torch.optim.AdamW
         else:
             raise ValueError("optimizer not found")
 
