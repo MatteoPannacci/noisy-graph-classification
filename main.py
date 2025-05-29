@@ -274,6 +274,13 @@ def main(args):
         else:
             checkpoint_intervals = [num_epochs]
 
+        if args.train_from_best:
+            use_validation = False
+            del train_loader
+            del train_dataset
+            train_loader = val_loader
+            model.load_state_dict(torch.load(checkpoint_path))
+
         print("starting training")
         for epoch in range(num_epochs):
 
@@ -390,6 +397,7 @@ if __name__ == "__main__":
     parser.add_argument('--lr', type=float, default=0.001, help='optimizer learning rate')
     parser.add_argument('--batch_size', type=int, default=32, help='input batch size for training (default: 32)')
     parser.add_argument('--epochs', type=int, default=10, help='number of epochs to train (default: 10)')
+    parser.add_argument('--train_from_best', type=bool, default=False, action=argparse.BooleanOptionalAction)
 
     # Loss
     parser.add_argument('--loss_type', type=int, default=1, help='[1]: CrossEntropy; [2]: NoisyCrossEntropy; [3] SymmetricCrossEntropy; [4] NCOD; [5] GeneralizedCrossEntropy; [6] NoisyCrossEntropyCustom')
