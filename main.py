@@ -276,8 +276,6 @@ def main(args):
 
         if args.train_from_best:
             use_validation = False
-            del train_loader
-            del train_dataset
             train_loader = val_loader
             model.load_state_dict(torch.load(checkpoint_path))
 
