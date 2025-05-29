@@ -215,6 +215,13 @@ def main(args):
         else:
             class_weights = None
 
+        if args.optimizer_type == 'adam':
+            optimizer_type = torch.optim.Adam
+        elif args.optimizer_type == 'adamw':
+            optimizer_type == torch.optim.AdamW
+        else:
+            raise ValueError("optimizer not found")
+
         # choose loss type
         if args.loss_type == 1:
             criterion = torch.nn.CrossEntropyLoss(weight=class_weights)
@@ -250,13 +257,13 @@ def main(args):
 
         # setup optimizer
         if args.loss_type == 4:
-            optimizer = torch.optim.Adam(
+            optimizer = optimizer_type(
                 list(model.parameters()) + list(criterion.parameters()),
                 lr=args.lr,
                 weight_decay=args.weight_decay
             )
         else:
-            optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+            optimizer = optimizer_type(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
         num_epochs = args.epochs
         best_accuracy = 0.0
@@ -396,6 +403,7 @@ if __name__ == "__main__":
     parser.add_argument('--batch_size', type=int, default=32, help='input batch size for training (default: 32)')
     parser.add_argument('--epochs', type=int, default=10, help='number of epochs to train (default: 10)')
     parser.add_argument('--train_from_best', type=bool, default=False, action=argparse.BooleanOptionalAction)
+    parser.add_argument('--optimizer_type', type=str, default='adam', choices=['adam','adamw'])
 
     # Loss
     parser.add_argument('--loss_type', type=int, default=1, help='[1]: CrossEntropy; [2]: NoisyCrossEntropy; [3] SymmetricCrossEntropy; [4] NCOD; [5] GeneralizedCrossEntropy; [6] NoisyCrossEntropyCustom')
