@@ -7,6 +7,7 @@ import pandas as pd
 import logging
 from tqdm import tqdm
 import gc
+import torch.nn.utils
 from torch.utils.data import random_split
 from torchmetrics.classification import Accuracy
 from torchmetrics.classification import F1Score
@@ -59,6 +60,7 @@ def train(data_loader, model, optimizer, criterion, device, save_checkpoints, ch
             loss = criterion(output, data.y)
 
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         optimizer.step()
 
         total_loss += loss.item()
