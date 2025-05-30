@@ -29,6 +29,10 @@ class GraphDataset(Dataset):
 
 
 def dictToGraphObject(graph_dict, idx):
+
+    for key in graph_dict:
+        print(key)
+
     edge_index = torch.tensor(graph_dict["edge_index"], dtype=torch.long)
     edge_attr = torch.tensor(graph_dict["edge_attr"], dtype=torch.float) if graph_dict["edge_attr"] else None
     num_nodes = graph_dict["num_nodes"]
