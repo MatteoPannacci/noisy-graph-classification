@@ -384,7 +384,7 @@ def main(args):
         save_predictions(predictions, args.test_path)
     else:
         print("generating predictions with ensemble")
-        total_scores = torch.zeros(len(test_dataset))
+        total_scores = torch.zeros((len(test_dataset),6))
         ensemble_folder = os.path.join(script_dir, f"checkpoints/{test_dir_name}_ensemble")
         for model_name in os.listdir(ensemble_folder):
             model_path = os.path.join(ensemble_folder, model_name)
