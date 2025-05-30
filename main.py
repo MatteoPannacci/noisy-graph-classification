@@ -232,9 +232,9 @@ def main(args):
 
         # choose loss type
         if args.loss_type == 1:
-            criterion = torch.nn.CrossEntropyLoss(weight=class_weights, label_smoothing=args.label_smooothing)
+            criterion = torch.nn.CrossEntropyLoss(weight=class_weights, label_smoothing=args.label_smoothing)
         elif args.loss_type == 2:
-            criterion = NoisyCrossEntropyLoss(args.noise_prob, weight=class_weights, label_smoothing=args.label_smooothing)
+            criterion = NoisyCrossEntropyLoss(args.noise_prob, weight=class_weights, label_smoothing=args.label_smoothing)
         elif args.loss_type == 3:
             criterion = SymmetricCrossEntropyLoss(alpha=args.alpha, beta=args.beta)
         elif args.loss_type == 4:
@@ -253,13 +253,13 @@ def main(args):
                 device = device,
                 encoder_features = args.emb_dim,
                 total_epochs = args.epochs,
-                label_smoothing=args.label_smooothing
+                label_smoothing=args.label_smoothing
             )
 
         elif args.loss_type == 5:
             criterion = GeneralizedCrossEntropyLoss(q=args.q, weight=class_weights)
         elif args.loss_type == 6:
-            criterion = NoisyCrossEntropyLossCustom(args.noise_prob, weight=class_weights, label_smoothing=args.label_smooothing)
+            criterion = NoisyCrossEntropyLossCustom(args.noise_prob, weight=class_weights, label_smoothing=args.label_smoothing)
 
         else:
             raise ValueError("criterion not found")
