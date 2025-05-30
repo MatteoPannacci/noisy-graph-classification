@@ -391,7 +391,8 @@ def main(args):
         print("generating predictions with ensemble")
         total_scores = torch.zeros(len(test_dataset))
         ensemble_folder = os.path.join(script_dir, f"checkpoints/{test_dir_name}_ensemble")
-        for model_path in os.listdir(ensemble_folder):
+        for model_name in os.listdir(ensemble_folder):
+            model_path = os.path.join(ensemble_folder, model_name)
             model.load_state_dict(torch.load(model_path))
             model_scores = evaluate(test_loader, model, device, return_scores=True)
             total_scores += model_scores
@@ -406,25 +407,25 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train and evaluate GNN models on graph datasets.")
 
     # General
-    parser.add_argument("--train_path", type=str, help="Path to the training dataset (optional).")
-    parser.add_argument("--test_path", type=str, required=True, help="Path to the test dataset.")
-    parser.add_argument("--val_proportion", type=float, default=0.0, help="proportion of the train set to use for the validation set")
-    parser.add_argument("--num_checkpoints", type=int, help="Number of checkpoints to save during training.")
+    parser.add_argument('--train_path', type=str, help='Path to the training dataset (optional).')
+    parser.add_argument('--test_path', type=str, required=True, help='Path to the test dataset.')
+    parser.add_argument('--val_proportion', type=float, default=0.0, help='proportion of the train set to use for the validation set')
+    parser.add_argument('--num_checkpoints', type=int, help='Number of checkpoints to save during training.')
     parser.add_argument('--device', type=int, default=1, help='which gpu to use if any (default: 0)')
     parser.add_argument('--seed', type=int, default=42, help='random seed')
-    parser.add_argument('--save_all_best', type=bool, default=False, action=argparse.BooleanOptionalAction)
-    parser.add_argument('--from_pretrain', type=bool, default=False, action=argparse.BooleanOptionalAction)
+    parser.add_argument('--save_all_best', type=bool, default=False, action=argparse.BooleanOptionalAction, help='save the model each time it has the highest accuracy')
+    parser.add_argument('--from_pretrain', type=bool, default=False, action=argparse.BooleanOptionalAction, help='start the training from the "model_pretrain_best.pth" in the /checkpoints folder')
 
     # Architecture
-    parser.add_argument('--gnn_type', type=str, default='gin', choices=['gin', 'gcn', 'gat'], help='GNN type: gin or gcn')
-    parser.add_argument('--virtual_node', type=bool, default=True, action=argparse.BooleanOptionalAction, help='Use virtual node or not')
-    parser.add_argument('--residual', type=bool, default=False, action=argparse.BooleanOptionalAction, help='Using residual connection or not')
-    parser.add_argument('--drop_ratio', type=float, default=0.5, help='dropout ratio (default: 0.5)')
-    parser.add_argument('--num_layer', type=int, default=5, help='number of GNN message passing layers (default: 5)')
-    parser.add_argument('--emb_dim', type=int, default=300, help='dimensionality of hidden units in GNNs (default: 300)')
-    parser.add_argument('--graph_pooling_type', type=str, default='mean', help='mean, sum, max, attention, set2set')
-    parser.add_argument('--jk', type=str, default="last", choices=['last', 'sum'])
-    parser.add_argument('--aggr_type', type=str, default='add', choices=['add', 'mean'])
+    parser.add_argument('--gnn_type', type=str, default='gin', choices=['gin', 'gcn'], help='GNN type: gin or gcn')
+    parser.add_argument('--virtual_node', type=bool, default=True, action=argparse.BooleanOptionalAction, help='use virtual node')
+    parser.add_argument('--residual', type=bool, default=False, action=argparse.BooleanOptionalAction, help='use residual connection')
+    parser.add_argument('--drop_ratio', type=float, default=0.5, help='dropout ratio')
+    parser.add_argument('--num_layer', type=int, default=5, help='number of GNN message passing layers')
+    parser.add_argument('--emb_dim', type=int, default=300, help='dimensionality of hidden units in GNNs')
+    parser.add_argument('--graph_pooling_type', type=str, default='mean', choices=['mean', 'sum', 'max', 'attention', 'set2set'], help='type of pooling for the overall graph representation')
+    parser.add_argument('--jk', type=str, default='last', choices=['last', 'sum'], help='')
+    parser.add_argument('--aggr_type', type=str, default='add', choices=['add', 'mean'], help='aggregation type for the node message passing')
 
     # Training
     parser.add_argument('--lr', type=float, default=0.001, help='optimizer learning rate')
