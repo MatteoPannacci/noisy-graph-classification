@@ -97,7 +97,7 @@ def evaluate(data_loader, model, device, calculate_accuracy=False, return_labels
 
     pred_labels = torch.empty(len(data_loader.dataset), device=device, dtype=torch.int64)
     true_labels = torch.empty(len(data_loader.dataset), device=device, dtype=torch.int64)
-    scores = torch.empty(len(data_loader.dataset), device=device)
+    scores = torch.empty((len(data_loader.dataset),6), device=device)
 
     start_idx = 0
 
