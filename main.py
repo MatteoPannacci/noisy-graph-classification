@@ -295,11 +295,6 @@ def main(args):
         else:
             checkpoint_intervals = [num_epochs]
 
-        if args.train_from_best:
-            use_validation = False
-            train_loader = val_loader
-            model.load_state_dict(torch.load(checkpoint_path))
-
         print("starting training")
         for epoch in range(num_epochs):
 
@@ -424,15 +419,14 @@ if __name__ == "__main__":
     parser.add_argument('--num_layer', type=int, default=5, help='number of GNN message passing layers')
     parser.add_argument('--emb_dim', type=int, default=300, help='dimensionality of hidden units in GNNs')
     parser.add_argument('--graph_pooling_type', type=str, default='mean', choices=['mean', 'sum', 'max', 'attention', 'set2set'], help='type of pooling for the overall graph representation')
-    parser.add_argument('--jk', type=str, default='last', choices=['last', 'sum'], help='')
+    parser.add_argument('--jk', type=str, default='last', choices=['last', 'sum'], help='aggregation type along layers for the node representation')
     parser.add_argument('--aggr_type', type=str, default='add', choices=['add', 'mean'], help='aggregation type for the node message passing')
 
     # Training
     parser.add_argument('--lr', type=float, default=0.001, help='optimizer learning rate')
     parser.add_argument('--batch_size', type=int, default=32, help='input batch size for training (default: 32)')
     parser.add_argument('--epochs', type=int, default=10, help='number of epochs to train (default: 10)')
-    parser.add_argument('--train_from_best', type=bool, default=False, action=argparse.BooleanOptionalAction)
-    parser.add_argument('--optimizer_type', type=str, default='adam', choices=['adam','adamw'])
+    parser.add_argument('--optimizer_type', type=str, default='adam', choices=['adam','adamw'], help='optimizer name')
 
     # Loss
     parser.add_argument('--loss_type', type=int, default=1, help='[1]: CrossEntropy; [2]: NoisyCrossEntropy; [3] SymmetricCrossEntropy; [4] NCOD; [5] GeneralizedCrossEntropy; [6] NoisyCrossEntropyCustom')
