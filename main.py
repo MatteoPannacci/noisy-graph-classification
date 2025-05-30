@@ -231,9 +231,9 @@ def main(args):
 
         # choose loss type
         if args.loss_type == 1:
-            criterion = torch.nn.CrossEntropyLoss(weight=class_weights)
+            criterion = torch.nn.CrossEntropyLoss(weight=class_weights, label_smoothing=args.label_smooothing)
         elif args.loss_type == 2:
-            criterion = NoisyCrossEntropyLoss(args.noise_prob, weight=class_weights)
+            criterion = NoisyCrossEntropyLoss(args.noise_prob, weight=class_weights, label_smoothing=args.label_smooothing)
         elif args.loss_type == 3:
             criterion = SymmetricCrossEntropyLoss(alpha=args.alpha, beta=args.beta)
         elif args.loss_type == 4:
@@ -251,13 +251,14 @@ def main(args):
                 ratio_balance = 0.2,
                 device = device,
                 encoder_features = args.emb_dim,
-                total_epochs = args.epochs
+                total_epochs = args.epochs,
+                label_smoothing=args.label_smooothing
             )
 
         elif args.loss_type == 5:
             criterion = GeneralizedCrossEntropyLoss(q=args.q, weight=class_weights)
         elif args.loss_type == 6:
-            criterion = NoisyCrossEntropyLossCustom(args.noise_prob, weight=class_weights)
+            criterion = NoisyCrossEntropyLossCustom(args.noise_prob, weight=class_weights, label_smoothing=args.label_smooothing)
 
         else:
             raise ValueError("criterion not found")
@@ -421,6 +422,7 @@ if __name__ == "__main__":
     parser.add_argument('--q', type=float, default=0.5)
     parser.add_argument('--alpha', type=float, default=1.0)
     parser.add_argument('--beta', type=float, default=1.0)
+    parser.add_argument('--label_smoothing', type=float, default=0.0)
 
     args = parser.parse_args()
 

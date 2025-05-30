@@ -5,10 +5,10 @@ import torch.nn.functional as F
 
 class NoisyCrossEntropyLoss(torch.nn.Module):
 
-    def __init__(self, p_noisy, weight=None):
+    def __init__(self, p_noisy, weight=None, label_smoothing=0.0):
         super().__init__()
         self.p = p_noisy
-        self.ce = torch.nn.CrossEntropyLoss(reduction='none', weight=weight)
+        self.ce = torch.nn.CrossEntropyLoss(reduction='none', weight=weight, label_smoothing=label_smoothing)
 
     def forward(self, logits, targets):
         losses = self.ce(logits, targets)
@@ -17,10 +17,10 @@ class NoisyCrossEntropyLoss(torch.nn.Module):
 
 
 class NoisyCrossEntropyLossCustom(torch.nn.Module):
-    def __init__(self, p_noisy, weight=None):
+    def __init__(self, p_noisy, weight=None, label_smoothing=0.0):
         super().__init__()
         self.p_noisy = p_noisy
-        self.ce = torch.nn.CrossEntropyLoss(reduction='none', weight=weight)
+        self.ce = torch.nn.CrossEntropyLoss(reduction='none', weight=weight, label_smoothing=label_smoothing)
 
     def forward(self, logits, targets):
         losses = self.ce(logits, targets)
@@ -57,7 +57,7 @@ class SymmetricCrossEntropyLoss(torch.nn.Module):
         rce = (-1*torch.sum(pred * torch.log(label_one_hot), dim=1))
 
         if self.weight is not None:
-            sample_weights = self.weight[targets]
+            sample_weights = self.weight[label_one_hot]
             rce = (rce * sample_weights).mean()
         else:
             rce = rce.mean()
@@ -65,7 +65,6 @@ class SymmetricCrossEntropyLoss(torch.nn.Module):
         # Loss
         loss = self.alpha * ce + self.beta * rce
         return loss
-
 
 
 class GeneralizedCrossEntropyLoss(torch.nn.Module):
