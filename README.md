@@ -5,40 +5,40 @@ Repository of the team "OopsAllNoise" (members: Matteo Pannacci 1948942, Emilian
 ## Command-line Arguments
 
     # General
-    --train_path: type=str, help='Path to the training dataset (optional).'
-    --test_path: type=str, required=True, help='Path to the test dataset.'
-    --val_proportion: type=float, default=0.0, help='proportion of the train set to use for the validation set'
-    --num_checkpoints: type=int, help='Number of checkpoints to save during training.'
-    --device: type=int, default=1, help='which gpu to use if any (default: 0)'
-    --seed: type=int, default=42, help='random seed'
-    --save_all_best: type=bool, default=False
-    --from_pretrain: type=bool, default=False
-    --predict_with_ensemble: type=bool, default=True
+    --train_path (str): help='Path to the training dataset (optional).'
+    --test_path (str): help='Path to the test dataset.'
+    --val_proportion (float, 0.0): help='proportion of the train set to use for the validation set'
+    --num_checkpoints (int): help='Number of checkpoints to save during training.'
+    --device (int, 1): help='which gpu to use if any'
+    --seed (int, 42): help='random seed'
+    --save_all_best (bool, False):
+    --from_pretrain (bool, False):
+    --predict_with_ensemble (bool, True):
 
     # Architecture
-    --gnn_type: type=str, default='gin', choices=['gin', 'gcn', 'gat'], help='GNN type: gin or gcn'
-    --virtual_node: type=bool, default=True, help='Use virtual node or not'
-    --residual: type=bool, default=False, help='Using residual connection or not'
-    --drop_ratio: type=float, default=0.5, help='dropout ratio (default: 0.5)'
-    --num_layer: type=int, default=5, help='number of GNN message passing layers (default: 5)'
-    --emb_dim: type=int, default=300, help='dimensionality of hidden units in GNNs (default: 300)'
-    --graph_pooling_type: type=str, default='mean', help='mean, sum, max, attention, set2set'
-    --jk: type=str, default='last', choices=['last', 'sum']
-    --aggr_type: type=str, default='add', choices=['add', 'mean']
+    --gnn_type (str, 'gin'): choices=['gin', 'gcn', 'gat'], help='GNN type: gin or gcn'
+    --virtual_node (bool, True): help='Use virtual node or not'
+    --residual (bool, False): help='Using residual connection or not'
+    --drop_ratio (float, 0.5): help='dropout ratio'
+    --num_layer (int, 5): help='number of GNN message passing layers'
+    --emb_dim (int, 300): help='dimensionality of hidden units in GNNs'
+    --graph_pooling_type (str, 'mean'): help='mean, sum, max, attention, set2set'
+    --jk (str, 'last'): choices=['last', 'sum']
+    --aggr_type (str, 'add'): choices=['add', 'mean']
 
     # Training
-    --lr: type=float, default=0.001, help='optimizer learning rate'
-    --batch_size: type=int, default=32, help='input batch size for training (default: 32)'
-    --epochs: type=int, default=10, help='number of epochs to train (default: 10)'
-    --train_from_best: type=bool, default=False
-    --optimizer_type: type=str, default='adam', choices=['adam','adamw']
+    --lr (float, 0.001): help='optimizer learning rate'
+    --batch_size (int, 32): help='input batch size for training'
+    --epochs (int, 10): help='number of epochs to train'
+    --train_from_best (bool, False):
+    --optimizer_type (str, 'adam'): choices=['adam','adamw']
 
     # Loss
-    --loss_type: type=int, default=1, help='[1]: CrossEntropy; [2]: NoisyCrossEntropy; [3] SymmetricCrossEntropy; [4] NCOD; [5] GeneralizedCrossEntropy; [6] NoisyCrossEntropyCustom'
-    --noise_prob: type=float, default=0.2
-    --weight_decay: type=float, default=0.0
-    --use_class_weights: type=bool, default=False, help='use class weights in the loss computation'
-    --q: type=float, default=0.5
-    --alpha: type=float, default=1.0
-    --beta: type=float, default=1.0
-    --label_smoothing: type=float, default=0.0
+    --loss_type (int, 1): help='[1]: CrossEntropy; [2]: NoisyCrossEntropy; [3] SymmetricCrossEntropy; [4] NCOD; [5] GeneralizedCrossEntropy; [6] NoisyCrossEntropyCustom'
+    --noise_prob (float, 0.2):
+    --weight_decay (float, 0.0):
+    --use_class_weights (bool, False): help='use class weights in the loss computation'
+    --q (float, 0.5):
+    --alpha (float, 1.0):
+    --beta (float, 1.0):
+    --label_smoothing (float, 0.0):
