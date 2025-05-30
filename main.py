@@ -410,6 +410,7 @@ if __name__ == "__main__":
     parser.add_argument('--seed', type=int, default=42, help='random seed')
     parser.add_argument('--save_all_best', type=bool, default=False, action=argparse.BooleanOptionalAction, help='save the model each time it has the highest accuracy')
     parser.add_argument('--from_pretrain', type=bool, default=False, action=argparse.BooleanOptionalAction, help='start the training from the "model_pretrain_best.pth" in the /checkpoints folder')
+    parser.add_argument('--predict_with_ensemble', type=bool, default=True, action=argparse.BooleanOptionalAction, help='predict using the models from the ensemble folder')
 
     # Architecture
     parser.add_argument('--gnn_type', type=str, default='gin', choices=['gin', 'gcn'], help='GNN type: gin or gcn')
@@ -430,14 +431,13 @@ if __name__ == "__main__":
 
     # Loss
     parser.add_argument('--loss_type', type=int, default=1, help='[1]: CrossEntropy; [2]: NoisyCrossEntropy; [3] SymmetricCrossEntropy; [4] NCOD; [5] GeneralizedCrossEntropy; [6] NoisyCrossEntropyCustom')
-    parser.add_argument('--noise_prob', type=float, default=0.2)
-    parser.add_argument('--weight_decay', type=float, default=0.0)
+    parser.add_argument('--noise_prob', type=float, default=0.2, help='parameter p for NoisyCrossEntropy and NoisyCrossEntropyCustom')
+    parser.add_argument('--weight_decay', type=float, default=0.0, help='weight decay regularization')
     parser.add_argument('--use_class_weights', type=bool, default=False, action=argparse.BooleanOptionalAction, help='use class weights in the loss computation')
-    parser.add_argument('--q', type=float, default=0.5)
-    parser.add_argument('--alpha', type=float, default=1.0)
-    parser.add_argument('--beta', type=float, default=1.0)
-    parser.add_argument('--label_smoothing', type=float, default=0.0)
-    parser.add_argument('--predict_with_ensemble', type=bool, default=True, action=argparse.BooleanOptionalAction)
+    parser.add_argument('--q', type=float, default=0.5, help='q parameter for GeneralizedCrossEntropy')
+    parser.add_argument('--alpha', type=float, default=1.0, help='alpha parameter for SymmetricCrossEntropy')
+    parser.add_argument('--beta', type=float, default=1.0, help='beta parameter for SymmetricCrossEntropy')
+    parser.add_argument('--label_smoothing', type=float, default=0.0, help='label smoothing regularization')
 
     args = parser.parse_args()
 
