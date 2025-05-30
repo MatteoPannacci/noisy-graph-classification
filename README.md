@@ -30,7 +30,6 @@ Repository of the team "OopsAllNoise" (members: Matteo Pannacci 1948942, Emilian
     --lr (float, 0.001): optimizer learning rate
     --batch_size (int, 32): input batch size for training
     --epochs (int, 10): number of epochs to train
-    --train_from_best (bool, False):
     --optimizer_type (str, 'adam'): adam, adamw
 
     # Loss
