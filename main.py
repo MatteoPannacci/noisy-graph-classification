@@ -85,7 +85,7 @@ def train(data_loader, model, optimizer, criterion, device, save_checkpoints, ch
     return total_loss / len(data_loader), accuracy, f1_score
 
 
-def evaluate(data_loader, model, device, calculate_accuracy=False, return_labels=False):
+def evaluate(data_loader, model, device, calculate_accuracy=False, return_labels=False, return_scores=False):
 
     model.eval()
     
@@ -97,6 +97,7 @@ def evaluate(data_loader, model, device, calculate_accuracy=False, return_labels
 
     pred_labels = torch.empty(len(data_loader.dataset), device=device, dtype=torch.int64)
     true_labels = torch.empty(len(data_loader.dataset), device=device, dtype=torch.int64)
+    scores = torch.empty(len(data_loader.dataset), device=device)
 
     start_idx = 0
 
@@ -112,6 +113,7 @@ def evaluate(data_loader, model, device, calculate_accuracy=False, return_labels
             batch_size = data.num_graphs
             end_idx = start_idx + batch_size
             pred_labels[start_idx:end_idx] = pred
+            scores[start_idx:end_idx] = output
             if calculate_accuracy or return_labels:
                 total_loss += criterion(output, data.y).item()
                 true_labels[start_idx:end_idx] = data.y
@@ -125,6 +127,9 @@ def evaluate(data_loader, model, device, calculate_accuracy=False, return_labels
 
     if return_labels:
         return pred_labels.cpu().numpy(), true_labels.cpu().numpy()
+
+    if return_scores:
+        return scores.cpu().numpy()
 
     else:
         return pred_labels.cpu().numpy()
@@ -378,9 +383,22 @@ def main(args):
     test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
 
     # Generate predictions for the test set using the best model
-    print("generating prediction")
-    predictions = evaluate(test_loader, model, device, calculate_accuracy=False)
-    save_predictions(predictions, args.test_path)
+    if not args.predict_with_ensemble:
+        print("generating prediction")
+        predictions = evaluate(test_loader, model, device, calculate_accuracy=False)
+        save_predictions(predictions, args.test_path)
+    else:
+        print("generating predictions with ensemble")
+        total_scores = torch.zeros(len(test_dataset))
+        ensemble_folder = os.path.join(checkpoints_folder, f"{test_dir_name}_ensemble")
+        for model in os.listdir(ensemble_folder):
+            model.load_state_dict(torch.load(checkpoint_path))
+            model_scores = evaluate(test_loader, model, device, return_scores=True)
+            total_scores += model_scores
+        predictions = total_scores.argmax(dim=1)
+        save_predictions(predictions, args.test_path)
+        
+
 
 
 if __name__ == "__main__":
@@ -424,6 +442,7 @@ if __name__ == "__main__":
     parser.add_argument('--alpha', type=float, default=1.0)
     parser.add_argument('--beta', type=float, default=1.0)
     parser.add_argument('--label_smoothing', type=float, default=0.0)
+    parser.add_argument('--predict_with_ensemble', type=bool, default=True, action=argparse.BooleanOptionalAction)
 
     args = parser.parse_args()
 
