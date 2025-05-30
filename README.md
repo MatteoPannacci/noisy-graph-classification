@@ -4,11 +4,13 @@ Repository of the team "OopsAllNoise" (members: Matteo Pannacci 1948942, Emilian
 
 ## Command-line Arguments
 
+List and brief description of the arguments that can be provided to the model.
+
     # General
-    --train_path (str): path to the training dataset (optional).
-    --test_path (str): path to the test dataset.
+    --train_path (str): path to the training dataset (without this it's test-only)
+    --test_path (str): path to the test dataset (mandatory)
     --val_proportion (float, 0.0): proportion of the train set to use for the validation set
-    --num_checkpoints (int): number of checkpoints to save during training.
+    --num_checkpoints (int): number of checkpoints to save during training
     --device (int, 1): which gpu to use if any
     --seed (int, 42): random seed
     --save_all_best (bool, False): save the model each time it has the highest accuracy
