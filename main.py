@@ -391,8 +391,8 @@ def main(args):
         print("generating predictions with ensemble")
         total_scores = torch.zeros(len(test_dataset))
         ensemble_folder = os.path.join(script_dir, f"checkpoints/{test_dir_name}_ensemble")
-        for model in os.listdir(ensemble_folder):
-            model.load_state_dict(torch.load(checkpoint_path))
+        for model_path in os.listdir(ensemble_folder):
+            model.load_state_dict(torch.load(model_path))
             model_scores = evaluate(test_loader, model, device, return_scores=True)
             total_scores += model_scores
         predictions = total_scores.argmax(dim=1)
