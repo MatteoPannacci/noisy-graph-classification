@@ -410,7 +410,7 @@ if __name__ == "__main__":
     parser.add_argument('--seed', type=int, default=42, help='random seed')
     parser.add_argument('--save_all_best', type=bool, default=False, action=argparse.BooleanOptionalAction, help='save the model each time it has the highest accuracy')
     parser.add_argument('--from_pretrain', type=bool, default=False, action=argparse.BooleanOptionalAction, help='start the training from the "model_pretrain_best.pth" in the /checkpoints folder')
-    parser.add_argument('--predict_with_ensemble', type=bool, default=True, action=argparse.BooleanOptionalAction, help='predict using the models from the ensemble folder')
+    parser.add_argument('--predict_with_ensemble', type=bool, default=False, action=argparse.BooleanOptionalAction, help='predict using the models from the ensemble folder')
 
     # Architecture
     parser.add_argument('--gnn_type', type=str, default='gin', choices=['gin', 'gcn'], help='GNN type: gin or gcn')
