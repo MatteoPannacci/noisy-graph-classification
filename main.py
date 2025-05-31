@@ -386,9 +386,11 @@ def main(args):
         if test_dir_name in ['A', 'D']:
             print("type of ensemble weights: softmax")
             args.ensemble_weights = 'softmax'
+            print(args.ensemble_weights)
         else:
             print("type of ensemble weights: voting")
             args.ensemble_weights = 'no'
+            print(args.ensemble_weights)
 
         total_scores = torch.zeros((len(test_dataset),6))
         ensemble_folder = os.path.join(script_dir, f"checkpoints/{test_dir_name}_ensemble")
