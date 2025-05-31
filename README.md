@@ -14,6 +14,7 @@ Predictions on the test datasets are computed using ensembles of models. The mod
 
 ![plot](./prediction_procedure.png)
 
+To train the model all the hyperparameters have to be left on their default value except for the random seed which are (42, 1, 2) for the datasets A and D and (42, 1, 2, 3, 4, 5, 6) for the datasets B and C.
 
 ## Command-line Arguments
 
