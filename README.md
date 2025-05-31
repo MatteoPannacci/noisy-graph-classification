@@ -14,7 +14,15 @@ Predictions on the test datasets are computed using ensembles of models. The mod
 
 ![plot](./prediction_procedure.png)
 
+## Training and Testing
+
 To train the models all the hyperparameters have to be left on their default value except for the random seed which are (42, 1, 2) for the datasets A and D and (42, 1, 2, 3, 4, 5, 6) for the datasets B and C.
+
+    # Train
+    python main.py --test_path <path_to_test.json.gz> --train_path <optional_path_to_train.json.gz> --seed <random_seed_num>
+
+    # Test
+    python main.py --test_path <path_to_test.json.gz>
 
 ## Command-line Arguments
 
