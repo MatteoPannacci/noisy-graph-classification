@@ -6,6 +6,9 @@ Repository of the team "OopsAllNoise" (members: Matteo Pannacci 1948942, Emilian
 
 ![plot](./architecture.png)
 
+![plot](./prediction_procedure.png)
+
+
 ## Command-line Arguments
 
 List and brief description of the arguments that can be provided to the model.
