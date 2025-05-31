@@ -11,6 +11,7 @@ import torch.nn.utils
 from torch.utils.data import random_split
 from torchmetrics.classification import Accuracy
 from torchmetrics.classification import F1Score
+import torch.nn.functional as F
 
 from src.models import GNN 
 
@@ -389,7 +390,12 @@ def main(args):
         for model_name in os.listdir(ensemble_folder):
             model_path = os.path.join(ensemble_folder, model_name)
             model.load_state_dict(torch.load(model_path))
-            model_scores = evaluate(test_loader, model, device, return_scores=True)
+            if args.ensemble_weights == 'softmax':
+                model_scores = evaluate(test_loader, model, device, return_scores=True)
+            elif args.ensemble_weights == 'no':
+                model_scores = F.one_hot(evaluate(test_loader, model, device), num_classes=6)
+            else:
+                raise ValueError("ensemble weight type not found")
             total_scores += model_scores
         predictions = total_scores.argmax(dim=1)
         save_predictions(predictions, args.test_path)
@@ -411,6 +417,7 @@ if __name__ == "__main__":
     parser.add_argument('--save_all_best', type=bool, default=False, action=argparse.BooleanOptionalAction, help='save the model each time it has the highest accuracy')
     parser.add_argument('--from_pretrain', type=bool, default=False, action=argparse.BooleanOptionalAction, help='start the training from the "model_pretrain_best.pth" in the /checkpoints folder')
     parser.add_argument('--predict_with_ensemble', type=bool, default=False, action=argparse.BooleanOptionalAction, help='predict using the models from the ensemble folder')
+    parser.add_argument('--ensemble_weights', type='str', choices=['softmax','no'], default='softmax')
 
     # Architecture
     parser.add_argument('--gnn_type', type=str, default='gin', choices=['gin', 'gcn'], help='GNN type: gin or gcn')
