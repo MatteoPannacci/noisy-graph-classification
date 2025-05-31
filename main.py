@@ -187,12 +187,6 @@ def main(args):
     checkpoints_folder = os.path.join(script_dir, "checkpoints", test_dir_name)
     os.makedirs(checkpoints_folder, exist_ok=True)
 
-    # Load pre-trained model for inference
-    if os.path.exists(checkpoint_path) and not args.train_path:
-        print("loading best model")
-        model.load_state_dict(torch.load(checkpoint_path))
-        print(f"Loaded best model from {checkpoint_path}")
-
     # If train_path is provided, train the model
     if args.train_path:
 
@@ -381,8 +375,10 @@ def main(args):
     # Generate predictions for the test set using the best model
     if not args.predict_with_ensemble:
         print("generating prediction")
+        model.load_state_dict(torch.load(checkpoint_path))
         predictions = evaluate(test_loader, model, device, calculate_accuracy=False)
         save_predictions(predictions, args.test_path)
+
     else:
         print("generating predictions with ensemble")
         total_scores = torch.zeros((len(test_dataset),6))
