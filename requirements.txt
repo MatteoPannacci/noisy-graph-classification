@@ -1,3 +1,4 @@
+# Requires Python == 3.10.12
 torch==2.0.1
 torchmetrics
 torch-geometric
