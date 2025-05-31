@@ -12,8 +12,8 @@ from torch.utils.data import random_split
 from torchmetrics.classification import Accuracy
 from torchmetrics.classification import F1Score
 import torch.nn.functional as F
+from src.models import GNN
 
-from src.models import GNN 
 
 
 def save_predictions(predictions, test_path):
