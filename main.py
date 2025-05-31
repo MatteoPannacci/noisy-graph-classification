@@ -399,7 +399,6 @@ def main(args):
             total_scores += model_scores
         predictions = total_scores.argmax(dim=1)
         save_predictions(predictions, args.test_path)
-        
 
 
 
