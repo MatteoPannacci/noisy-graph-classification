@@ -4,7 +4,25 @@ Repository of the team "OopsAllNoise" (members: Matteo Pannacci 1948942, Emilian
 
 ## Method Overview
 
+The project is based on the provided [baseline repository](https://github.com/Graph-Classification-Noisy-Label/hackaton/tree/baselineCe). In our work we implemented and tried different loss functions (SymmetricCrossEntropy, NCOD, GeneralizedCrossEntropy and a customized NoisyCrossEntropy function), we investigated a pretrain the models using all the datasets and then fine-tuning them on the desired one (which didn't obtain noticeable improvements), we added and tuned some hyperparameters (e.g. JK (JumpingKnowledge), message aggregation strategy, label smoothing). Finally we implemented a ensemble strategy where at testing time we exploit the knowledge of different models to compute our predictions.
+
+The architecture used is the same for all datasets. We use a 4-layer Graph Isomorphism Network (GIN) with a node embedding size of 512 and with virtual nodes. The model is regularized using a strong dropout ratio (0.5) and adopting a weight decay of 1e-5 in the optimizer. The validation accuracy is monitored in order to find the best model and avoid overfitting on the training dataset. We provide plot for the behaviour of the loss function, the accuracy and the f1-score of both training and validation dataset during the training, we also plot the confusion matrix produced by each model on both splits.
+
 ![plot](./architecture.png)
+
+Predictions on the test datasets are computed using ensembles of models. The models are trained with different random seeds and different train/validation splits of the provided train dataset. In particular for datasets A and D we used 3-models ensembles where each model contributes to the vote with its softmax scores while for datasets B and C we used 7-models ensembles with a majority-voting strategy.
+
+![plot](./prediction_procedure.png)
+
+## Training and Testing
+
+To train the models all the hyperparameters have to be left on their default value except for the random seed which are (42, 1, 2) for the datasets A and D and (42, 1, 2, 3, 4, 5, 6) for the datasets B and C.
+
+    # Train
+    python main.py --test_path <path_to_test.json.gz> --train_path <optional_path_to_train.json.gz> --seed <random_seed_num>
+
+    # Test
+    python main.py --test_path <path_to_test.json.gz>
 
 ## Command-line Arguments
 
