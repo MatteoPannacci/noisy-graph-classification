@@ -4,7 +4,7 @@ Repository of the team "OopsAllNoise" (members: Matteo Pannacci 1948942, Emilian
 
 ## Method Overview
 
-???
+![plot](./architecture.png)
 
 ## Command-line Arguments
 
