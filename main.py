@@ -389,7 +389,7 @@ def main(args):
             if args.ensemble_weights == 'softmax':
                 model_scores = evaluate(test_loader, model, device, return_scores=True)
             elif args.ensemble_weights == 'no':
-                model_scores = F.one_hot(evaluate(test_loader, model, device), num_classes=6)
+                model_scores = F.one_hot(torch.tensor(evaluate(test_loader, model, device)), num_classes=6)
             else:
                 raise ValueError("ensemble weight type not found")
             total_scores += model_scores
